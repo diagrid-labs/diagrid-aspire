@@ -29,10 +29,11 @@ jobs:
       - name: "Checkout"
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
+      # The SDK band comes from global.json, so the workflow and the repo cannot drift apart.
       - name: "Setup dotnet"
         uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5.4.0
         with:
-          dotnet-version: 10.*.*
+          global-json-file: global.json
 
       # Analyzers run inside this build, and Directory.Build.props makes a warning fatal for the shipped package,
       # so a new CA/IDE violation in Hosting.Catalyst fails here rather than drifting in unnoticed.
