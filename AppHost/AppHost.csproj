@@ -11,7 +11,16 @@
 
     <ItemGroup>
       <PackageReference Include="CommunityToolkit.Aspire.Hosting.Dapr" />
-      <!-- Version comes from Directory.Packages.props by design: the Aspire SDK reads PackageVersion under CPM. Running the demo at the package's declared 13.1.0 floor is deliberate, as that is the minimum a consumer gets. -->
+      <!--
+           Deliberately versionless. Aspire.AppHost.Sdk reads PackageVersion under central package management,
+           so this resolves to the 13.1.0 in Directory.Packages.props rather than the SDK's own 13.4.5. Running
+           the demo at the floor Hosting.Catalyst declares is the point: it is the minimum a consumer gets, and
+           nothing else exercises it.
+
+           Moving this project to 13.4.5 is not just a version change. Aspire 13.4.5 requires OpenTelemetry
+           >= 1.15.3, while transitive pinning forces the central 1.14.0, so a VersionOverride here fails
+           restore with NU1109. Raising the two OpenTelemetry PackageVersions is the prerequisite.
+      -->
       <PackageReference Include="Aspire.Hosting.AppHost" />
       <ProjectReference Include="..\Hosting.Catalyst\Hosting.Catalyst.csproj" IsAspireProjectResource="false" />
       <ProjectReference Include="..\TestApi\TestApi.csproj" />
