@@ -31,7 +31,7 @@
 
     <ItemGroup>
         <!-- todo: Is this the package we should be depending on? -->
-        <PackageReference Include="Aspire.Hosting.AppHost" Version="13.1.0"/>
+        <PackageReference Include="Aspire.Hosting.AppHost"/>
     </ItemGroup>
 
     <ItemGroup>
