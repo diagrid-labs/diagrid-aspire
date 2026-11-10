@@ -22,11 +22,14 @@
         <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.4" />
         <PackageVersion Include="Xunit.SkippableFact" Version="1.5.23" />
         <!--
-            Transitive pin, load-bearing although nothing references MessagePack directly:
-            Aspire.Hosting.AppHost 13.1.0 -> Aspire.Hosting -> StreamJsonRpc 2.22.23 -> MessagePack 2.5.192,
+            Transitive pin, load-bearing although nothing references MessagePack directly.
+            As of this pin: Aspire.Hosting.AppHost -> Aspire.Hosting -> StreamJsonRpc -> MessagePack 2.5.192,
             which carries twelve advisories. Eleven patch at 2.5.301 and GHSA-qhrr-8q5h-9q3h at 2.5.303;
             2.5.307 is the latest 2.5.x, so this stays inside the minor line StreamJsonRpc asked for.
             Transitive pinning is on, so this applies whichever path introduces it.
+            Re-check whenever Aspire.Hosting.AppHost is bumped, and check the resolved MessagePack version
+            rather than assuming a newer Aspire fixed it: Aspire 13.4.5 would bring StreamJsonRpc 2.25.29 ->
+            MessagePack 2.5.302, which still carries GHSA-qhrr-8q5h-9q3h.
         -->
         <PackageVersion Include="MessagePack" Version="2.5.307" />
     </ItemGroup>
