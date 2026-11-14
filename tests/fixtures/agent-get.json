@@ -1,5 +1,5 @@
 {
-  "_capturedFrom": "diagrid CLI 1.112.0, captured by the nightly workflow",
+  "_capturedFrom": "diagrid CLI 1.127.0, captured by the nightly workflow",
   "apiVersion": "cra.diagrid.io/v1beta1",
   "kind": "Agent",
   "metadata": {
@@ -41,11 +41,6 @@
         },
         "status": {
           "apiToken": "diagrid://mock-api-token",
-          "messages": [
-            {
-              "message": "missing instances status data"
-            }
-          ],
           "regionIdentities": [
             {
               "region": "diagrid-aws-eu-west",

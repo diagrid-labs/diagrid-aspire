@@ -8,6 +8,10 @@ subscriptions and HTTP endpoints. Runtime data is not copied. State,
 key/value data, pub/sub messages and workflow history stay in the source
 project, and the copy starts empty.
 
+Where the region supports workflows, a new project gets a Diagrid-managed
+workflow store by default. Pass --disable-managed-workflow to create the
+project without it and bring your own actor state store for workflows.
+
 Usage:
   diagrid project create <project-name> [flags]
 
@@ -22,11 +26,17 @@ Examples:
   # Create a project across every region of a region group
   diagrid project create my-project --region-group prod-us
 
-  # Create a project with managed workflow enabled
-  diagrid project create my-project --enable-managed-workflow
+  # Create a project without the Diagrid-managed workflow store
+  diagrid project create my-project --disable-managed-workflow
 
   # Create a project with a custom max body size for all ids
   diagrid project create my-project --global-id-max-body-size 8Mi
+
+  # Create a project whose Apps raise a notification for failed and stalled root workflows, unless an App sets its own policy
+  diagrid project create my-project --enable-workflow-notifications FAILED,STALLED --workflow-notifications-root-only
+
+  # Create a project whose Apps archive the history of completed and failed workflows to an S3 binding, unless an App sets its own policy
+  diagrid project create my-project --archive-binding-name archive-store --archive-binding-type bindings.aws.s3 --enable-workflow-archive COMPLETED,FAILED
 
   # Create a project with workflow history signing enabled
   diagrid project create my-project --enable-workflow-history-signing
@@ -39,19 +49,25 @@ Examples:
 
 
 Flags:
-  -r, --region string                     Region ID where the project will be deployed
-      --deploy-managed-pubsub             Deploy a Diagrid Pub/Sub Broker for use with the Pub/Sub API
-      --deploy-managed-kv                 Deploy a Diagrid Key/Value Store for use with the Key/Value API
-      --enable-managed-workflow           Enable Workflow API by leveraging a Diagrid-managed state store used by the workflow engine. Alternatively, enable Workflow support by providing an external component to a transactional state store
-      --enable-workflow-history-signing   Enable workflow history signing for this project. Can only be set at creation time
-  -w, --wait                              Wait for long-running resource creation to finish
-      --use                               Set the created project as the default project for the current context
-      --disable-app-tunnels               Disable app tunnels for this project
-      --global-id-max-body-size string    Maximum body size for HTTP and gRPC requests across all ids in this project (e.g., "4Mi", "8Mi", "16Mi"). Can be overridden at the individual id level
-      --ignore-if-exists                  Exit with success if the project already exists instead of returning an error
-      --region-group string               Region group to place the project across, instead of a single region. Mutually exclusive with --region, and immutable once the project exists.
-      --duplicate string                  Create the project as a copy of this existing project's settings and resources. Runtime data such as state, messages and workflow history is not copied. Use --region or --region-group to place the copy somewhere other than the source
-  -h, --help                              help for create
+  -r, --region string                           Region ID where the project will be deployed
+      --deploy-managed-pubsub                   Deploy a Diagrid Pub/Sub Broker for use with the Pub/Sub API
+      --deploy-managed-kv                       Deploy a Diagrid Key/Value Store for use with the Key/Value API
+      --disable-managed-workflow                Create the project without the Diagrid-managed workflow store, which is on by default where the region supports workflows
+      --enable-workflow-history-signing         Enable workflow history signing for this project. Can only be set at creation time
+  -w, --wait                                    Wait for long-running resource creation to finish
+      --use                                     Set the created project as the default project for the current context
+      --disable-app-tunnels                     Disable app tunnels for this project
+      --global-id-max-body-size string          Maximum body size for HTTP and gRPC requests across all ids in this project (e.g., "4Mi", "8Mi", "16Mi"). Can be overridden at the individual id level
+      --enable-workflow-notifications strings   Workflow statuses to raise a notification for in every App of this project that sets no notification policy of its own. Agents and MCP servers do not use it: FAILED, TERMINATED, STALLED. Comma-separated or repeated. Statuses not listed raise no notification
+      --workflow-notifications-name string      Regular expression the workflow name must match in full for the project's notification policy to raise a notification. Empty matches every workflow
+      --workflow-notifications-root-only        Only raise the project's notifications for workflows with no parent
+      --archive-binding-name string             Output-binding component name that every App of this project with no archive policy of its own writes archived workflow history through. Agents and MCP servers do not use it. Setting this enables archiving
+      --archive-binding-type string             Binding component type for the project's archive destination (e.g., "bindings.aws.s3")
+      --enable-workflow-archive strings         Workflow statuses to archive in every App of this project that sets no archive policy of its own: COMPLETED, FAILED, TERMINATED. Comma-separated or repeated. Statuses not listed are not archived
+      --ignore-if-exists                        Exit with success if the project already exists instead of returning an error
+      --region-group string                     Region group to place the project across, instead of a single region. Mutually exclusive with --region, and immutable once the project exists.
+      --duplicate string                        Create the project as a copy of this existing project's settings and resources. Runtime data such as state, messages and workflow history is not copied. Use --region or --region-group to place the copy somewhere other than the source
+  -h, --help                                    help for create
 
 Global Flags:
       --api-key string   Diagrid Cloud API key
@@ -140,6 +156,7 @@ Flags:
       --max-body-size string                    Maximum request body size (e.g. "4Mi", "16Mi")
       --app-channel-timeout-seconds int32       Timeout in seconds for the sidecar to connect to the application endpoint
   -c, --app-config string                       Name of the Dapr Configuration the App loads, e.g. for tracing, access control or feature flags. It is the Configuration "diagrid app access" edits, so Apps bound to the same Configuration share its access rules
+      --workflow-api string                     Workflow API the App's workflows use: dapr (default) or temporal (preview)
       --enable-app-health-check                 Enable application-level health probing
       --app-health-check-path string            Health check endpoint path (e.g. /healthz)
       --app-health-probe-interval int32         Health probe interval in seconds
@@ -214,6 +231,8 @@ Flags:
       --archive-binding-name string       Output-binding component name to write archived workflow history through. Setting this enables archiving
       --archive-binding-type string       Binding component type for the archive destination (e.g., "bindings.aws.s3")
       --enable-workflow-archive strings   Workflow statuses to archive: COMPLETED, FAILED, TERMINATED. Comma-separated or repeated. Statuses not listed are not archived
+      --label stringToString              Label (key=value) applied to the Agent's workload pod and service account. Repeatable. Only supported in self-hosted regions (default [])
+      --annotation stringToString         Annotation (key=value) applied to the Agent's workload pod and service account, e.g. for managed identity. Repeatable. Only supported in self-hosted regions (default [])
   -h, --help                              help for create
 
 Global Flags:
