@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
+    <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
@@ -23,6 +23,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Aspire.Hosting.Dapr" />
+    <PackageReference Include="Aspire.Hosting.Dotnet" />
     <!-- The demo wiring is compiled in from the AppHost so the tests exercise the code that actually runs. -->
     <Compile Include="..\..\AppHost\DemoWiring.cs" Link="DemoWiring.cs" />
     <Content Include="..\..\AppHost\Resources\*.yaml" Link="Resources\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
@@ -39,6 +40,7 @@
     <Content Include="..\..\Hosting.Catalyst\Hosting.Catalyst.csproj" Link="packaging\Hosting.Catalyst.csproj" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="..\..\.github\workflows\release.yaml" Link="packaging\release.yaml" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="..\..\.github\workflows\ci.yaml" Link="packaging\ci.yaml" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\global.json" Link="packaging\global.json" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="Hosting.Catalyst.Tests.csproj" Link="packaging\Hosting.Catalyst.Tests.csproj" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="..\Hosting.Catalyst.IntegrationTests\Hosting.Catalyst.IntegrationTests.csproj" Link="packaging\Hosting.Catalyst.IntegrationTests.csproj" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="..\Hosting.Catalyst.SmokeTests\Hosting.Catalyst.SmokeTests.csproj" Link="packaging\Hosting.Catalyst.SmokeTests.csproj" CopyToOutputDirectory="PreserveNewest" />

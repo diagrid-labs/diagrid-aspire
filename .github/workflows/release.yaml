@@ -33,13 +33,9 @@ jobs:
       - name: "Setup dotnet"
         uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5.4.0
         with:
-          # global.json pins the SDK that builds; these install the RUNTIMES the net8.0 and net9.0 test
-          # hosts need. RollForward defaults to Minor and does not cross majors, so without them the
-          # suites run only on whatever the hosted image preinstalls, and release.yaml gates packing on
-          # those suites. A test pins both inputs.
-          dotnet-version: |
-            8.0.x
-            9.0.x
+          # The SDK that builds, and the only runtime the suites need while every project is net10.0.
+          # A suite that targets anything below the SDK band needs its runtime installed here as well;
+          # FrameworkCoverageTests fails naming the framework if that is ever forgotten.
           global-json-file: global.json
 
       - name: "Build Solution"

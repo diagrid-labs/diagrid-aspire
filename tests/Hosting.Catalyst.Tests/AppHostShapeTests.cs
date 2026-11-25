@@ -1,6 +1,7 @@
 using System.Text.RegularExpressions;
 using Aspire.Hosting;
 using Aspire.Hosting.ApplicationModel;
+using Aspire.Hosting.Dotnet;
 using CommunityToolkit.Aspire.Hosting.Dapr;
 using Diagrid.Aspire.Hosting.Catalyst;
 using Diagrid.Aspire.Test.AppHost;
@@ -10,16 +11,10 @@ namespace Hosting.Catalyst.Tests;
 // These tests build the distributed application model and never run it: no DCP, no process, no diagrid CLI.
 public class AppHostShapeTests
 {
-    private sealed class FakeApi : IProjectMetadata
-    {
-        public string ProjectPath => RepoFile("TestApi", "TestApi.csproj");
-        public LaunchSettings? LaunchSettings => null;
-    }
-
-    private static (IDistributedApplicationBuilder Builder, IResourceBuilder<ProjectResource> Api) Build(bool useCatalyst)
+    private static (IDistributedApplicationBuilder Builder, IResourceBuilder<DotnetProjectResource> Api) Build(bool useCatalyst)
     {
         var builder = DistributedApplication.CreateBuilder();
-        return (builder, DemoWiring.Configure<FakeApi>(builder, useCatalyst));
+        return (builder, DemoWiring.Configure(builder, useCatalyst, RepoFile("TestApi", "TestApi.csproj")));
     }
 
     private static string RepoFile(params string[] parts)
@@ -41,7 +36,7 @@ public class AppHostShapeTests
         return match.Groups[1].Value;
     }
 
-    private static string OssSidecarResourcesDir(IResourceBuilder<ProjectResource> api)
+    private static string OssSidecarResourcesDir(IResourceBuilder<DotnetProjectResource> api)
     {
         var sidecar = Assert.Single(api.Resource.Annotations.OfType<DaprSidecarAnnotation>());
         var options = Assert.Single(((IResource)sidecar.Sidecar).Annotations.OfType<DaprSidecarOptionsAnnotation>());
@@ -68,7 +63,7 @@ public class AppHostShapeTests
     public void The_USE_CATALYST_setting_selects_the_side(string value, bool expectCatalyst)
     {
         var builder = DistributedApplication.CreateBuilder([$"USE_CATALYST={value}"]);
-        DemoWiring.Configure<FakeApi>(builder, DemoWiring.UseCatalyst(builder));
+        DemoWiring.Configure(builder, DemoWiring.UseCatalyst(builder), RepoFile("TestApi", "TestApi.csproj"));
 
         Assert.Equal(expectCatalyst, builder.Resources.Any(r => r is CatalystProject));
     }

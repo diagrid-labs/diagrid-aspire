@@ -5,8 +5,10 @@ namespace Hosting.Catalyst.Tests;
 
 public class PublicSurfaceTests
 {
-    // The baseline is generated from the net10.0 build and shared by every target framework, so a
-    // framework-conditional public API makes the net8.0 or net9.0 run fail naming the member.
+    // Written when the package multi-targeted, to catch an API behind a framework conditional that only
+    // one framework would see. Aspire 17 ships net10.0 and net11.0 only, so the package is single-target
+    // and that cannot happen today; the baseline now earns its keep as a review gate, failing on any
+    // unintended change to the public surface. It becomes a parity guard again if a framework is re-added.
     [Fact]
     public void PublicSurfaceIsIdenticalOnEveryTargetFramework()
     {
@@ -16,9 +18,9 @@ public class PublicSurfaceTests
         // xunit sequence diff, which is how a guard like this ends up deleted. From the repo root:
         //   CATALYST_WRITE_PUBLIC_SURFACE=$PWD/tests/Hosting.Catalyst.Tests/public-surface.txt \
         //     dotnet test tests/Hosting.Catalyst.Tests --framework net10.0 --filter PublicSurfaceIsIdenticalOnEveryTargetFramework
-        // Regenerate from net10.0 only: the baseline is shared by all three frameworks on purpose, and
-        // writing it from a lower one would bake that framework's view in. This run writes and does not
-        // verify; the next ordinary run is what checks the result.
+        // Regenerate from the highest framework the package targets: a lower one would bake its narrower
+        // view in if the package ever multi-targets again. This run writes and does not verify; the next
+        // ordinary run is what checks the result.
         var destination = Environment.GetEnvironmentVariable("CATALYST_WRITE_PUBLIC_SURFACE");
         if (!string.IsNullOrWhiteSpace(destination))
         {

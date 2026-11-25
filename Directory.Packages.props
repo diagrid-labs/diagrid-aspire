@@ -19,32 +19,35 @@
            here. The three OpenTelemetry.Instrumentation.* pins do not reach Hosting.Catalyst and do not
            appear in the nuspec.
 
-        2. Aspire.Hosting.AppHost is 13.6.5 because GHSA-f7vh-h5g3-7jrh (CVE-2026-120006, high, elevation
-           of privilege) affects every Aspire.Hosting below it, and the OpenTelemetry versions are 1.17.0
-           because 13.6.5 requires >= 1.17.0. 1.14.0 carried four advisories of its own, all patched at or
-           below 1.15.3. Both bumps self-defend: lowering either fails restore, with the advisory or NU1109.
+        2. Aspire.Hosting.AppHost is 17.0.0, the current release, which ships net10.0 and net11.0 only.
+           That is why this package no longer multi-targets net8.0 and net9.0. 17.0.0 is also above
+           GHSA-f7vh-h5g3-7jrh (CVE-2026-120006, high, elevation of privilege), which affects every
+           Aspire.Hosting below 13.6.5, and the OpenTelemetry versions are 1.18.0 because 17.0.0 requires
+           >= 1.18.0. Both bumps self-defend: lowering either fails restore, with the advisory or NU1109.
     -->
     <ItemGroup>
-        <PackageVersion Include="Aspire.Hosting.AppHost" Version="13.6.5" />
+        <PackageVersion Include="Aspire.Hosting.AppHost" Version="17.0.0" />
+        <PackageVersion Include="Aspire.Hosting.Dotnet" Version="17.0.0" />
         <PackageVersion Include="CommunityToolkit.Aspire.Hosting.Dapr" Version="13.0.0" />
         <PackageVersion Include="Dapr.AspNetCore" Version="1.17.9" />
         <PackageVersion Include="Dapr.Workflow" Version="1.17.9" />
         <PackageVersion Include="Microsoft.Extensions.Http.Resilience" Version="10.1.0" />
         <PackageVersion Include="Microsoft.Extensions.ServiceDiscovery" Version="10.1.0" />
         <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
-        <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.17.0" />
-        <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.17.0" />
-        <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.17.0" />
-        <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="1.17.0" />
-        <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime" Version="1.17.0" />
+        <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.18.0" />
+        <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.18.0" />
+        <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.18.0" />
+        <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="1.18.0" />
+        <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime" Version="1.18.0" />
         <PackageVersion Include="xunit" Version="2.9.3" />
         <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.4" />
         <PackageVersion Include="Xunit.SkippableFact" Version="1.5.23" />
         <!--
             Transitive pin, load-bearing although nothing references MessagePack directly.
-            As of this pin: Aspire.Hosting.AppHost 13.6.5 -> Aspire.Hosting -> StreamJsonRpc 2.25.29 ->
-            MessagePack 2.5.302, which still carries GHSA-qhrr-8q5h-9q3h. 2.5.303 patches it and 2.5.307 is
-            the latest 2.5.x, so this stays inside the minor line StreamJsonRpc asked for.
+            As of this pin: Aspire.Hosting.AppHost 17.0.0 depends on MessagePack 2.5.307 directly, which
+            is where this pin now sits, so the two agree. It stayed necessary for a long time because the
+            chain through StreamJsonRpc resolved 2.5.302, which still carries GHSA-qhrr-8q5h-9q3h; 2.5.303
+            patches it and 2.5.307 is the latest 2.5.x.
             Transitive pinning is on, so this applies whichever path introduces it.
             Re-check whenever Aspire.Hosting.AppHost is bumped, and check the resolved MessagePack version
             rather than assuming a newer Aspire fixed it: every Aspire release so far has resolved to a

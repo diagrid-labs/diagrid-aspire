@@ -1,6 +1,7 @@
 using System.IO;
 using Aspire.Hosting;
 using Aspire.Hosting.ApplicationModel;
+using Aspire.Hosting.Dotnet;
 using CommunityToolkit.Aspire.Hosting.Dapr;
 using Diagrid.Aspire.Hosting.Catalyst;
 using Microsoft.Extensions.Configuration;
@@ -27,10 +28,14 @@ public static class DemoWiring
     /// </summary>
     public const string StateStoreName = Diagrid.Aspire.Hosting.Catalyst.ResourceBuilderExtensions.SampleKvName;
 
-    public static IResourceBuilder<ProjectResource> Configure<TProject>(IDistributedApplicationBuilder builder, bool useCatalyst, string projectName = DefaultProjectName)
-        where TProject : IProjectMetadata, new()
+    /// <param name="projectPath">
+    ///     Path to the API project, relative to the AppHost directory or absolute. Aspire 17 has no generic
+    ///     AddDotnetProject overload and its guidance is to pass a path rather than derive one from the
+    ///     generated Projects.* metadata, which this AppHost no longer generates.
+    /// </param>
+    public static IResourceBuilder<DotnetProjectResource> Configure(IDistributedApplicationBuilder builder, bool useCatalyst, string projectPath, string projectName = DefaultProjectName)
     {
-        var api = builder.AddProject<TProject>("test-api");
+        var api = builder.AddDotnetProject("test-api", projectPath);
 
         if (useCatalyst)
         {

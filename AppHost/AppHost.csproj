@@ -1,4 +1,4 @@
-<Project Sdk="Aspire.AppHost.Sdk/13.6.5">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
@@ -7,32 +7,35 @@
         <Nullable>enable</Nullable>
         <UserSecretsId>73c42576-88b9-44a1-be3b-bfa4fcfd97d9</UserSecretsId>
         <RootNamespace>Diagrid.Aspire.Test.AppHost</RootNamespace>
-        <!--
-            ASPIRE010 (AspireUseCliBundle=false) is 13.6.5's own default and fires on every build. Turning the
-            bundle on needs the Aspire CLI on PATH, which CI does not have. Silenced here instead, because the
-            build step is where analyzer violations are meant to stand out and a permanent warning trains
-            people past it. Nothing in this demo uses a bundle-only feature.
-        -->
-        <NoWarn>$(NoWarn);ASPIRE010</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
       <PackageReference Include="CommunityToolkit.Aspire.Hosting.Dapr" />
       <!--
-           Deliberately versionless. Aspire.AppHost.Sdk reads PackageVersion under central package management,
-           so this resolves to the version in Directory.Packages.props. Running the demo at the floor
-           Hosting.Catalyst declares is the point: it is the minimum a consumer gets, and nothing else
-           exercises it.
+           Deliberately versionless: central package management supplies the version from
+           Directory.Packages.props. Running the demo at the floor Hosting.Catalyst declares is the point:
+           it is the minimum a consumer gets, and nothing else exercises it.
 
-           That floor is 13.6.5 because GHSA-f7vh-h5g3-7jrh (CVE-2026-120006) affects every Aspire.Hosting
-           below it. Lowering it brings the advisory back, and with the NU1902/NU1903 waiver gone that fails
-           restore rather than warning. The central OpenTelemetry versions are 1.17.0 because 13.6.5 needs
-           >= 1.17.0; putting them back below that fails restore with NU1109. The Sdk version on line 1 is
-           kept level with the package so the SDK is never older than what it builds.
+           That floor is 17.0.0, the current release. It is also comfortably above
+           GHSA-f7vh-h5g3-7jrh (CVE-2026-120006), which affects every Aspire.Hosting below 13.6.5: lowering
+           the pin past that brings the advisory back, and with the NU1902/NU1903 waiver gone it fails
+           restore rather than warning. The central OpenTelemetry versions are 1.18.0 because 17.0.0 needs
+           >= 1.18.0; putting them back below that fails restore with NU1109.
+
+           This project is on Microsoft.NET.Sdk with these two packages referenced explicitly, which is the
+           layout Aspire 17 documents. Aspire.AppHost.Sdk still works but warns ASPIRE012, and its one real
+           advantage, generating Projects.* metadata from ProjectReference items, is not needed here:
+           AddDotnetProject takes a path.
       -->
       <PackageReference Include="Aspire.Hosting.AppHost" />
-      <ProjectReference Include="..\Hosting.Catalyst\Hosting.Catalyst.csproj" IsAspireProjectResource="false" />
-      <ProjectReference Include="..\TestApi\TestApi.csproj" />
+      <!-- AddDotnetProject lives here. Project v2 replaced AddProject<TProject> in Aspire 17. -->
+      <PackageReference Include="Aspire.Hosting.Dotnet" />
+      <ProjectReference Include="..\Hosting.Catalyst\Hosting.Catalyst.csproj" />
+      <!--
+           Build ordering only. AddDotnetProject starts TestApi from its path, so the AppHost does not
+           compile against its assembly, but the project still has to be built before the demo runs.
+      -->
+      <ProjectReference Include="..\TestApi\TestApi.csproj" ReferenceOutputAssembly="false" />
     </ItemGroup>
 
 </Project>
