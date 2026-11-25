@@ -46,6 +46,8 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         run: dotnet format --verify-no-changes --no-restore
 
+      # Each dotnet test below runs the suite on net8.0, net9.0 and net10.0, the frameworks the package ships.
+      # The matrix stays on OS only; the framework dimension lives in the test projects' TargetFrameworks.
       - name: "Unit tests"
         run: dotnet test tests/Hosting.Catalyst.Tests --no-build
 
