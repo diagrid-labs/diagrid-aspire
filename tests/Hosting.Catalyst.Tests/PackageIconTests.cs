@@ -21,6 +21,8 @@ public class PackageIconTests
             .Where(e => (string?)e.Attribute("Pack") == "true")
             .Select(e => ((string?)e.Attribute("PackagePath") ?? string.Empty, (string?)e.Attribute("Include") ?? string.Empty));
 
-        Assert.Contains(packaged, p => p.Item2.EndsWith(icon, StringComparison.Ordinal));
+        // Both halves matter: the archive entry path comes from PackagePath, so packing the right file to
+        // "icons/" would make the nuspec's logo.png unresolvable again while an Include-only check stayed green.
+        Assert.Contains(packaged, p => p.Item2.EndsWith(icon, StringComparison.Ordinal) && (p.Item1 == "/" || p.Item1.Length == 0));
     }
 }
