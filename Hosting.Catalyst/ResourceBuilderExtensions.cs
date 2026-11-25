@@ -199,7 +199,7 @@ public static class ResourceBuilderExtensions
 
         resourceBuilder.WithEnvironment(async (context) =>
         {
-            var applicationModel = (DistributedApplicationModel)context.ExecutionContext.ServiceProvider
+            var applicationModel = (DistributedApplicationModel)context.ExecutionContext.Services
                 .GetRequiredService(typeof(DistributedApplicationModel));
 
             var catalystProject = applicationModel.Resources.FirstOrDefault((resource) => resource is CatalystProject) as CatalystProject
