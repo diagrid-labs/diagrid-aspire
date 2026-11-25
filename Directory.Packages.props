@@ -10,14 +10,15 @@
 
         1. CentralPackageTransitivePinningEnabled promotes any PackageVersion that appears in a project's
            TRANSITIVE graph into a real dependency of that project's package. Hosting.Catalyst references
-           one package, Aspire.Hosting.AppHost, but its published nuspec now declares four: that one plus
-           MessagePack and two OpenTelemetry packages. The OpenTelemetry entries exist in this file only
-           because ServiceDefaults, a demo project, needs them. So bumping a version for the demo changes
-           the published package's dependency contract, and published versions are immutable. Kept on
-           purpose rather than worked around: the spec requires transitive pinning (R2), and the MessagePack
-           floor carries the security fix downstream to consumers. Check the packed nuspec after any change
-           here. The three OpenTelemetry.Instrumentation.* pins do not reach Hosting.Catalyst and do not
-           appear in the nuspec.
+           one package, Aspire.Hosting.AppHost, but its published nuspec declares four: that one plus
+           MessagePack and two OpenTelemetry packages. As of Aspire 17.0.0 those three pins are the exact
+           versions Aspire.Hosting.AppHost 17.0.0 itself depends on, so they impose no floor a consumer
+           was not already getting, and the promotion costs nothing today.
+           What to watch: the two OpenTelemetry entries are in this file because ServiceDefaults, a demo
+           project, needs them. Raising either above what Aspire requires silently raises the published
+           package's floor too, and published versions are immutable. Check the packed nuspec against
+           Aspire's own dependencies after any change here. The three OpenTelemetry.Instrumentation.* pins
+           do not reach Hosting.Catalyst and do not appear in the nuspec.
 
         2. Aspire.Hosting.AppHost is 17.0.0, the current release, which ships net10.0 and net11.0 only.
            That is why this package no longer multi-targets net8.0 and net9.0. 17.0.0 is also above
