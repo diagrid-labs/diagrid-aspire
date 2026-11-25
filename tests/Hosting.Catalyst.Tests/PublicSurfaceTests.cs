@@ -11,6 +11,24 @@ public class PublicSurfaceTests
     public void PublicSurfaceIsIdenticalOnEveryTargetFramework()
     {
         var actual = PublicSurface.Enumerate(typeof(CatalystProject).Assembly);
+
+        // Deliberately changed the public API? Regenerate the baseline instead of transcribing it out of an
+        // xunit sequence diff, which is how a guard like this ends up deleted. From the repo root:
+        //   CATALYST_WRITE_PUBLIC_SURFACE=$PWD/tests/Hosting.Catalyst.Tests/public-surface.txt \
+        //     dotnet test tests/Hosting.Catalyst.Tests --framework net10.0 --filter PublicSurfaceIsIdenticalOnEveryTargetFramework
+        // Regenerate from net10.0 only: the baseline is shared by all three frameworks on purpose, and
+        // writing it from a lower one would bake that framework's view in. This run writes and does not
+        // verify; the next ordinary run is what checks the result.
+        var destination = Environment.GetEnvironmentVariable("CATALYST_WRITE_PUBLIC_SURFACE");
+        if (!string.IsNullOrWhiteSpace(destination))
+        {
+            // Join with '\n' rather than WriteAllLines: on Windows that writes CRLF, and .gitattributes
+            // stores this file with LF, so the regenerated baseline would differ from the committed one in
+            // all 245 lines while saying exactly the same thing.
+            File.WriteAllText(destination, string.Join('\n', actual) + '\n');
+            return;
+        }
+
         var baselinePath = Path.Combine(AppContext.BaseDirectory, "public-surface.txt");
         var expected = File.ReadAllLines(baselinePath).Where(l => l.Length > 0).OrderBy(l => l, StringComparer.Ordinal);
         Assert.Equal(expected, actual);
