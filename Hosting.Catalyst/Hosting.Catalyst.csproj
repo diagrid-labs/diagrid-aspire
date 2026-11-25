@@ -9,7 +9,7 @@
         <PackageId>Diagrid.Aspire.Hosting.Catalyst</PackageId>
         <AssemblyName>Diagrid.Aspire.Hosting.Catalyst</AssemblyName>
         <IsPackable>true</IsPackable>
-        <PackageIcon>/catalyst-logo.png</PackageIcon>
+        <PackageIcon>logo.png</PackageIcon>
         <PackageReadmeFile>readme.md</PackageReadmeFile>
         <RepositoryUrl>https://github.com/diagrid-labs/catalyst-aspire</RepositoryUrl>
         <!--
@@ -45,9 +45,14 @@
     </ItemGroup>
     
     <ItemGroup>
-        <Content Include="../catalyst-logo.png" Link="/catalyst-logo.png" Pack="true" PackagePath="/" >
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </Content>
+        <!--
+            logo.png is generated from logo.svg, which came from diagridio/dotnet-ai, with:
+              magick -background none -density 1200 properties/logo.svg                 -resize 128x128 -gravity center -extent 128x128 -depth 8 properties/logo.png
+            128x128 is NuGet's recommended icon size. None, not Content: the icon is packaging
+            input, not something a consuming build should carry. The value of PackageIcon must
+            match an archive entry path exactly, or nuget.org renders a default icon.
+        -->
+        <None Include="../properties/logo.png" Pack="true" PackagePath="/" />
         <Content Include="../readme.md" Pack="true" PackagePath="/">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Content>
