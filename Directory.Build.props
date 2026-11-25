@@ -21,6 +21,23 @@
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <!-- CS1591 (missing XML doc on a public member) is a separate cleanup; documented members are the norm here. -->
         <NoWarn>$(NoWarn);CS1591</NoWarn>
+        <!--
+            Symbols and Source Link. The .NET 8+ SDK carries Source Link itself, which is why the packed
+            nuspec already has <repository commit="...">; no Microsoft.SourceLink.GitHub reference is needed.
+            A .snupkg beside the .nupkg is what lets a consumer step into this code from their debugger.
+        -->
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    </PropertyGroup>
+
+    <!--
+        Normalises source paths so Source Link resolves for consumers. Set only in CI: switching it on
+        locally makes local builds non-reproducible against CI output for no benefit.
+    -->
+    <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
+        <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
     </PropertyGroup>
 
 </Project>

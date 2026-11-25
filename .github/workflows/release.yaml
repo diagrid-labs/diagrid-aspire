@@ -79,7 +79,9 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: nupkg-${{ steps.choose_version.outputs.version }}
-          path: ./Hosting.Catalyst/nupkg/*.nupkg
+          # '*.*nupkg', not '*.nupkg': the latter does not glob '.snupkg', so widening this is the only
+          # thing that lets the symbols package leave CI. Easy to undo by accident; a test pins it.
+          path: ./Hosting.Catalyst/nupkg/*.*nupkg
           if-no-files-found: error
 
       # No --skip-duplicate: a version that already exists means this release was already published, and that
