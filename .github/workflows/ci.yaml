@@ -29,10 +29,14 @@ jobs:
       - name: "Checkout"
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
+      # The SDK band comes from global.json, so the workflow and the repo cannot drift apart.
       - name: "Setup dotnet"
         uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5.4.0
         with:
-          dotnet-version: 10.*.*
+          # The SDK that builds, and the only runtime the suites need while every project is net10.0.
+          # A suite that targets anything below the SDK band needs its runtime installed here as well;
+          # FrameworkCoverageTests fails naming the framework if that is ever forgotten.
+          global-json-file: global.json
 
       # Analyzers run inside this build, and Directory.Build.props makes a warning fatal for the shipped package,
       # so a new CA/IDE violation in Hosting.Catalyst fails here rather than drifting in unnoticed.
@@ -45,6 +49,9 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         run: dotnet format --verify-no-changes --no-restore
 
+      # Each dotnet test below runs the suite on every framework the package ships, which is net10.0 alone
+      # since Aspire 17 dropped net8.0 and net9.0. The matrix stays on OS only; the framework dimension
+      # lives in the test projects' TargetFrameworks, and FrameworkCoverageTests holds them in agreement.
       - name: "Unit tests"
         run: dotnet test tests/Hosting.Catalyst.Tests --no-build
 

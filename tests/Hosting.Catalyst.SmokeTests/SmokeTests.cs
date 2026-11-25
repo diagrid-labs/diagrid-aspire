@@ -13,12 +13,6 @@ public class SmokeTests
     // Only the shape matters: the model is built and provisioned, never run. The path must still resolve to a
     // real .csproj, because Aspire reads the project file while building the model -- AppContext.BaseDirectory
     // is this test's bin directory, which never contains one.
-    private sealed class FakeApi : IProjectMetadata
-    {
-        public string ProjectPath => RepoFile("TestApi", "TestApi.csproj");
-        public LaunchSettings? LaunchSettings => null;
-    }
-
     /// <summary>Resolves a path from the repository root, found by walking up to the solution file.</summary>
     private static string RepoFile(params string[] parts)
     {
@@ -53,9 +47,9 @@ public class SmokeTests
     [Fact]
     public void The_harness_points_at_the_real_TestApi_project()
     {
-        var path = new FakeApi().ProjectPath;
+        var path = RepoFile("TestApi", "TestApi.csproj");
 
-        Assert.True(File.Exists(path), $"FakeApi.ProjectPath does not exist: {path}");
+        Assert.True(File.Exists(path), $"The path the harness passes to AddDotnetProject does not exist: {path}");
         Assert.Equal("TestApi.csproj", Path.GetFileName(path));
     }
 
@@ -71,7 +65,7 @@ public class SmokeTests
         {
             // The USE_CATALYST=true AppHost wiring (test-api app, kvstore, pubsub, subscription), plus an agent.
             var builder = DistributedApplication.CreateBuilder(["USE_CATALYST=true"]);
-            DemoWiring.Configure<FakeApi>(builder, DemoWiring.UseCatalyst(builder), name);
+            DemoWiring.Configure(builder, DemoWiring.UseCatalyst(builder), RepoFile("TestApi", "TestApi.csproj"), name);
             var catalyst = builder.Resources.OfType<CatalystProject>().Single();
             Assert.Equal(name, catalyst.ProjectName);
             builder.AddExecutable("my-agent", "dotnet", ".").WithCatalystAgent();

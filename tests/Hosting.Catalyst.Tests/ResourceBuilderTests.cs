@@ -140,7 +140,7 @@ public class ResourceBuilderTests
             .AddSingleton(new DistributedApplicationModel(builder.Resources))
             .BuildServiceProvider();
         var executionContext = new DistributedApplicationExecutionContext(
-            new DistributedApplicationExecutionContextOptions(DistributedApplicationOperation.Run) { ServiceProvider = services });
+            new DistributedApplicationExecutionContextOptions(DistributedApplicationOperation.Run) { Services = services });
         var env = new Dictionary<string, object>();
         var context = new EnvironmentCallbackContext(executionContext, env);
 

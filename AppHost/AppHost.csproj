@@ -1,4 +1,4 @@
-<Project Sdk="Aspire.AppHost.Sdk/13.4.5">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
@@ -10,9 +10,32 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="CommunityToolkit.Aspire.Hosting.Dapr" Version="13.0.0" />
-      <ProjectReference Include="..\Hosting.Catalyst\Hosting.Catalyst.csproj" IsAspireProjectResource="false" />
-      <ProjectReference Include="..\TestApi\TestApi.csproj" />
+      <PackageReference Include="CommunityToolkit.Aspire.Hosting.Dapr" />
+      <!--
+           Deliberately versionless: central package management supplies the version from
+           Directory.Packages.props. Running the demo at the floor Hosting.Catalyst declares is the point:
+           it is the minimum a consumer gets, and nothing else exercises it.
+
+           That floor is 17.0.0, the current release. It is also comfortably above
+           GHSA-f7vh-h5g3-7jrh (CVE-2026-120006), which affects every Aspire.Hosting below 13.6.5: lowering
+           the pin past that brings the advisory back, and with the NU1902/NU1903 waiver gone it fails
+           restore rather than warning. The central OpenTelemetry versions are 1.18.0 because 17.0.0 needs
+           >= 1.18.0; putting them back below that fails restore with NU1109.
+
+           This project is on Microsoft.NET.Sdk with these two packages referenced explicitly, which is the
+           layout Aspire 17 documents. Aspire.AppHost.Sdk still works but warns ASPIRE012, and its one real
+           advantage, generating Projects.* metadata from ProjectReference items, is not needed here:
+           AddDotnetProject takes a path.
+      -->
+      <PackageReference Include="Aspire.Hosting.AppHost" />
+      <!-- AddDotnetProject lives here. Project v2 replaced AddProject<TProject> in Aspire 17. -->
+      <PackageReference Include="Aspire.Hosting.Dotnet" />
+      <ProjectReference Include="..\Hosting.Catalyst\Hosting.Catalyst.csproj" />
+      <!--
+           Build ordering only. AddDotnetProject starts TestApi from its path, so the AppHost does not
+           compile against its assembly, but the project still has to be built before the demo runs.
+      -->
+      <ProjectReference Include="..\TestApi\TestApi.csproj" ReferenceOutputAssembly="false" />
     </ItemGroup>
 
 </Project>

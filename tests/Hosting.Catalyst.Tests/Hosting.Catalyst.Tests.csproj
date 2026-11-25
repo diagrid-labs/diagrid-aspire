@@ -9,9 +9,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
-    <PackageReference Include="xunit" Version="2.9.3" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" />
   </ItemGroup>
 
   <ItemGroup>
@@ -22,13 +22,28 @@
     <ProjectReference Include="..\..\Hosting.Catalyst\Hosting.Catalyst.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="CommunityToolkit.Aspire.Hosting.Dapr" Version="13.0.0" />
+    <PackageReference Include="CommunityToolkit.Aspire.Hosting.Dapr" />
+    <PackageReference Include="Aspire.Hosting.Dotnet" />
     <!-- The demo wiring is compiled in from the AppHost so the tests exercise the code that actually runs. -->
     <Compile Include="..\..\AppHost\DemoWiring.cs" Link="DemoWiring.cs" />
     <Content Include="..\..\AppHost\Resources\*.yaml" Link="Resources\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\fixtures\*.json" Link="fixtures\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="public-surface.txt" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Read as data by the packaging tests. Copied, not referenced, so the assertions survive the
+         output-path differences between the three target frameworks. -->
+    <Content Include="..\..\Hosting.Catalyst\Hosting.Catalyst.csproj" Link="packaging\Hosting.Catalyst.csproj" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\.github\workflows\release.yaml" Link="packaging\release.yaml" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\.github\workflows\ci.yaml" Link="packaging\ci.yaml" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\global.json" Link="packaging\global.json" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="Hosting.Catalyst.Tests.csproj" Link="packaging\Hosting.Catalyst.Tests.csproj" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\Hosting.Catalyst.IntegrationTests\Hosting.Catalyst.IntegrationTests.csproj" Link="packaging\Hosting.Catalyst.IntegrationTests.csproj" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\Hosting.Catalyst.SmokeTests\Hosting.Catalyst.SmokeTests.csproj" Link="packaging\Hosting.Catalyst.SmokeTests.csproj" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>

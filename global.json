@@ -1,0 +1,7 @@
+{
+  "_comment": "Pins the SDK major/minor. latestFeature allows the newest installed 10.0.x feature band, so a new band is a deliberate bump here rather than a silent CI change.",
+  "sdk": {
+    "version": "10.0.100",
+    "rollForward": "latestFeature"
+  }
+}

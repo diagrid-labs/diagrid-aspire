@@ -29,10 +29,14 @@ jobs:
         with:
           fetch-depth: 0
 
+      # The SDK band comes from global.json, so the workflow and the repo cannot drift apart.
       - name: "Setup dotnet"
         uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5.4.0
         with:
-          dotnet-version: 10.*.*
+          # The SDK that builds, and the only runtime the suites need while every project is net10.0.
+          # A suite that targets anything below the SDK band needs its runtime installed here as well;
+          # FrameworkCoverageTests fails naming the framework if that is ever forgotten.
+          global-json-file: global.json
 
       - name: "Build Solution"
         run: dotnet build
@@ -78,7 +82,9 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: nupkg-${{ steps.choose_version.outputs.version }}
-          path: ./Hosting.Catalyst/nupkg/*.nupkg
+          # '*.*nupkg', not '*.nupkg': the latter does not glob '.snupkg', so widening this is the only
+          # thing that lets the symbols package leave CI. Easy to undo by accident; a test pins it.
+          path: ./Hosting.Catalyst/nupkg/*.*nupkg
           if-no-files-found: error
 
       # No --skip-duplicate: a version that already exists means this release was already published, and that
