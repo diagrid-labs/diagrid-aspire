@@ -1,0 +1,218 @@
+using Aspire.Hosting;
+using Aspire.Hosting.ApplicationModel;
+using Diagrid.Aspire.Hosting;
+using Diagrid.Aspire.Hosting.Model;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace Hosting.Diagrid.Tests;
+
+public class ResourceBuilderTests
+{
+    [Fact]
+    public void WithDiagrid_and_WithDiagridApp_produce_identical_resource_graphs()
+    {
+        var viaAlias = GraphOf(b => b.WithDiagrid());
+        var viaApp = GraphOf(b => b.WithDiagridApp());
+
+        Assert.NotEmpty(viaApp);
+        Assert.Equal(viaAlias, viaApp);
+        // Guards against a vacuous comparison: the graph must include the proxy and its arguments.
+        Assert.Contains(viaApp, line => line.StartsWith("worker-diagrid-proxy args:", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void Registers_the_identity_for_a_resource_with_no_http_endpoint()
+    {
+        var (project, worker) = BuildWorkerWithNoEndpoint();
+
+        var identity = Assert.Single(project.Identities);
+        Assert.Same(worker.Resource, identity.Key);
+        Assert.Equal(IdentityKind.App, identity.Value.Kind);
+    }
+
+    [Fact]
+    public void Omits_app_port_from_dev_run_for_a_resource_with_no_http_endpoint()
+    {
+        var (project, _) = BuildWorkerWithNoEndpoint();
+        var args = DevRunArgsFor(project);
+
+        Assert.DoesNotContain("--app-port", args);
+        Assert.Contains("--id", args);
+        Assert.DoesNotContain("--app-id", args);
+    }
+
+    [Fact]
+    public void Passes_app_port_to_dev_run_for_a_resource_with_an_http_endpoint()
+    {
+        var builder = DistributedApplication.CreateBuilder();
+        var diagrid = builder.AddDiagridProject("demo");
+        builder.AddContainer("api", "img").WithHttpEndpoint(targetPort: 8080).WithDiagridApp();
+
+        var args = DevRunArgsFor(diagrid.Resource, "api");
+
+        var index = args.IndexOf("--app-port");
+        Assert.True(index >= 0, "--app-port should be present when the resource has an HTTP endpoint");
+        Assert.Equal("{api.bindings.http.port}", args[index + 1]);
+        Assert.Equal("api", args[args.IndexOf("--id") + 1]);
+    }
+
+    [Fact]
+    public void Dev_run_argv_for_a_resource_with_an_http_endpoint_is_exactly_as_expected()
+    {
+        var builder = DistributedApplication.CreateBuilder();
+        var diagrid = builder.AddDiagridProject("demo");
+        builder.AddContainer("api", "img").WithHttpEndpoint(targetPort: 8080).WithDiagridApp();
+
+        Assert.Equal(
+            [
+                "dev", "run", "--no-color=true", "--approve", "--project", "demo", "--id", "api",
+                "--app-port", "{api.bindings.http.port}", "--skip-managed-kv", "--skip-managed-pubsub",
+            ],
+            DevRunArgsFor(diagrid.Resource, "api"));
+    }
+
+    [Fact]
+    public void Dev_run_argv_for_a_resource_without_an_http_endpoint_is_exactly_as_expected()
+    {
+        var (project, _) = BuildWorkerWithNoEndpoint();
+
+        Assert.Equal(
+            [
+                "dev", "run", "--no-color=true", "--approve", "--project", "demo", "--id", "worker",
+                "--skip-managed-kv", "--skip-managed-pubsub",
+            ],
+            DevRunArgsFor(project));
+    }
+
+    [Fact]
+    public void Rejects_an_invalid_resource_name_at_registration_naming_the_resource()
+    {
+        var builder = DistributedApplication.CreateBuilder();
+        builder.AddDiagridProject("demo");
+        var bad = builder.AddExecutable("TestApi", "dotnet", ".");
+
+        var ex = Assert.Throws<ArgumentException>(() => bad.WithDiagridApp());
+        Assert.Contains("TestApi", ex.Message, StringComparison.Ordinal);
+    }
+
+    // Aspire accepts resource names up to 64 characters (measured: 64 ok, 65 rejected with ASPIRE006).
+    // The proxy is named "{name}-diagrid-proxy", 14 characters longer, so the longest usable name is 50.
+    [Fact]
+    public void Accepts_a_resource_name_whose_proxy_name_is_exactly_at_the_aspire_limit()
+    {
+        var builder = DistributedApplication.CreateBuilder();
+        var diagrid = builder.AddDiagridProject("demo");
+        var name = new string('a', 50);
+
+        builder.AddExecutable(name, "dotnet", ".").WithDiagridApp();
+
+        Assert.Single(diagrid.Resource.Identities);
+        Assert.Equal(64, $"{name}-diagrid-proxy".Length);
+    }
+
+    [Fact]
+    public void Rejects_a_resource_name_whose_proxy_name_exceeds_the_aspire_limit_naming_the_resource()
+    {
+        var builder = DistributedApplication.CreateBuilder();
+        builder.AddDiagridProject("demo");
+        // One past the ceiling: the proxy suffix is 14 characters, so 51 makes a 65-character proxy name.
+        var name = new string('a', 51);
+        var resource = builder.AddExecutable(name, "dotnet", ".");
+
+        var ex = Assert.Throws<ArgumentException>(() => resource.WithDiagridApp());
+
+        Assert.Contains($"'{name}'", ex.Message, StringComparison.Ordinal);
+        Assert.Contains("too long", ex.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task Environment_callback_resolves_for_a_resource_with_no_http_endpoint()
+    {
+        var builder = DistributedApplication.CreateBuilder();
+        var diagrid = builder.AddDiagridProject("demo");
+        var worker = builder.AddExecutable("worker", "dotnet", ".").WithDiagridApp();
+
+        var project = diagrid.Resource;
+        project.GrpcEndpoint.SetResult("https://grpc.example");
+        project.HttpEndpoint.SetResult("https://http.example");
+        project.Identities[worker.Resource].Details.SetResult(new AppDetails { ApiToken = "tok" });
+
+        var services = new ServiceCollection()
+            .AddSingleton(new DistributedApplicationModel(builder.Resources))
+            .BuildServiceProvider();
+        var executionContext = new DistributedApplicationExecutionContext(
+            new DistributedApplicationExecutionContextOptions(DistributedApplicationOperation.Run) { Services = services });
+        var env = new Dictionary<string, object>();
+        var context = new EnvironmentCallbackContext(executionContext, env);
+
+        foreach (var annotation in worker.Resource.Annotations.OfType<EnvironmentCallbackAnnotation>())
+        {
+            await annotation.Callback(context);
+        }
+
+        Assert.Equal("https://grpc.example", env["DAPR_GRPC_ENDPOINT"]);
+        Assert.Equal("https://http.example", env["DAPR_HTTP_ENDPOINT"]);
+        Assert.Equal("tok", env["DAPR_API_TOKEN"]);
+    }
+
+    private static (DiagridProject Project, IResourceBuilder<ExecutableResource> Worker) BuildWorkerWithNoEndpoint()
+    {
+        var builder = DistributedApplication.CreateBuilder();
+        var diagrid = builder.AddDiagridProject("demo");
+        var worker = builder.AddExecutable("worker", "dotnet", ".").WithDiagridApp();
+        return (diagrid.Resource, worker);
+    }
+
+    private static List<string> DevRunArgsFor(DiagridProject project, string resourceName = "worker")
+    {
+        return ArgsOf(ProxyOf(project, resourceName));
+    }
+
+    private static ExecutableResource ProxyOf(DiagridProject project, string resourceName)
+    {
+        var owner = project.Identities.Keys.Single(r => r.Name == resourceName);
+        var proxy = owner.Annotations.OfType<ResourceRelationshipAnnotation>()
+            .Select(a => a.Resource)
+            .OfType<ExecutableResource>()
+            .Single(r => r.Name == $"{resourceName}-diagrid-proxy");
+        return proxy;
+    }
+
+    private static List<string> ArgsOf(ExecutableResource proxy)
+    {
+        var args = new List<object>();
+        var context = new CommandLineArgsCallbackContext(args, proxy);
+        foreach (var annotation in proxy.Annotations.OfType<CommandLineArgsCallbackAnnotation>())
+        {
+            annotation.Callback(context).GetAwaiter().GetResult();
+        }
+
+        return args
+            .Select(a => a is IManifestExpressionProvider m ? m.ValueExpression : a.ToString()!)
+            .ToList();
+    }
+
+    private static List<string> GraphOf(Action<IResourceBuilder<ExecutableResource>> configure)
+    {
+        var builder = DistributedApplication.CreateBuilder();
+        builder.AddDiagridProject("demo");
+        var worker = builder.AddExecutable("worker", "dotnet", ".");
+        configure(worker);
+
+        var lines = new List<string>();
+        foreach (var resource in builder.Resources.OrderBy(r => r.Name, StringComparer.Ordinal))
+        {
+            lines.Add($"{resource.Name} [{string.Join(",", resource.Annotations.Select(a => a.GetType().Name).OrderBy(n => n, StringComparer.Ordinal))}]");
+            if (resource is ExecutableResource exe && exe.Name.EndsWith("-diagrid-proxy", StringComparison.Ordinal))
+            {
+                lines.Add($"{exe.Name} args: {string.Join(" ", ArgsOf(exe))}");
+            }
+
+            if (resource is DiagridProject p)
+            {
+                lines.Add($"identities: {string.Join(",", p.Identities.Select(i => $"{i.Key.Name}:{i.Value.Kind}"))}");
+            }
+        }
+        return lines;
+    }
+}

@@ -116,7 +116,7 @@ dotnet_naming_style.t_prefixed.required_prefix = T
 # at AppHost provisioning time, not in a request path. Not worth the indirection.
 dotnet_diagnostic.CA1848.severity = none
 # An exception that cannot say which CLI command failed is useless, so the standard parameterless/message-only
-# constructors are deliberately absent from CatalystCliException.
+# constructors are deliberately absent from DiagridCliException.
 dotnet_diagnostic.CA1032.severity = none
 
 # Demo apps: TestApi and AppHost are written in the single-file minimal-API style the .NET templates produce,

@@ -1,6 +1,6 @@
 # Diagrid Aspire Integration
 
-![NuGet Version](https://img.shields.io/nuget/v/Diagrid.Aspire.Hosting.Catalyst)
+![NuGet Version](https://img.shields.io/nuget/v/Diagrid.Aspire.Hosting)
 
 This integration allows you to seamlessly connect your locally running Aspire projects to live Diagrid infrastructure.
 
@@ -43,12 +43,12 @@ diagrid login
 
 ### 3 - Add the integration to your AppHost project
 
-You can find [the package on NuGet](https://www.nuget.org/packages/Diagrid.Aspire.Hosting.Catalyst).
+You can find [the package on NuGet](https://www.nuget.org/packages/Diagrid.Aspire.Hosting).
 
 Add the package by running:
 
 ```bash
-dotnet add package Diagrid.Aspire.Hosting.Catalyst
+dotnet add package Diagrid.Aspire.Hosting
 ```
 
 ### 4 - Configure your AppHost
@@ -56,12 +56,12 @@ dotnet add package Diagrid.Aspire.Hosting.Catalyst
 At a minimum, you must always add the following to your project to enable the integration:
 
 ```csharp
-builder.AddCatalystProject("your-desired-project-name");
+builder.AddDiagridProject("your-desired-project-name");
 ```
 
 This will ensure that a Diagrid project exists or that you are connected to an existing one.
 
-**Pass a project name.** `AddCatalystProject()` with no name throws for AppHosts that use top-level statements, which is the default Aspire template: their entry point is `Program` in the global namespace, so there is no namespace to derive a name from.
+**Pass a project name.** `AddDiagridProject()` with no name throws for AppHosts that use top-level statements, which is the default Aspire template: their entry point is `Program` in the global namespace, so there is no namespace to derive a name from.
 
 After that, you can start defining your [Diagrid appids](https://docs.diagrid.io/develop/connect/) by annotating
 your project resources and containers:
@@ -69,23 +69,23 @@ your project resources and containers:
 ```csharp
 builder
     .AddProject<MyProject>("my-project")
-    .WithCatalystApp();
+    .WithDiagridApp();
 ```
 
-Each resource that you tag in this way will automatically have an application entry created in the Diagrid Console. Use `WithCatalystAgent()` instead to register the resource as a Diagrid agent — support for that depends on the Diagrid deployment, and where there is no agent API, provisioning fails naming the resource. `WithCatalyst()` is an equivalent alias of `WithCatalystApp()`.
+Each resource that you tag in this way will automatically have an application entry created in the Diagrid Console. Use `WithDiagridAgent()` instead to register the resource as a Diagrid agent — support for that depends on the Diagrid deployment, and where there is no agent API, provisioning fails naming the resource. `WithDiagrid()` is an equivalent alias of `WithDiagridApp()`.
 
 Resources with no HTTP endpoint, such as workflow-only workers, are supported.
 
-**Resource names are validated.** A name that is not a valid Diagrid name is rejected, as is one whose derived `{name}-catalyst-proxy` resource would exceed Aspire's 64-character limit — so names longer than 49 characters.
+**Resource names are validated.** A name that is not a valid Diagrid name is rejected, as is one whose derived `{name}-diagrid-proxy` resource would exceed Aspire's 64-character limit — so names longer than 50 characters.
 
 The link to the Diagrid Console is derived from the `DIAGRID_URL` variable, using the same rules as the Diagrid CLI. For the default API URL it points at `catalyst.diagrid.io`.
 
 #### Project options
 
-`AddCatalystProject` takes an optional `ProjectDescriptor` that controls how the project is created:
+`AddDiagridProject` takes an optional `ProjectDescriptor` that controls how the project is created:
 
 ```csharp
-builder.AddCatalystProject("your-project", new ProjectDescriptor
+builder.AddDiagridProject("your-project", new ProjectDescriptor
 {
     Region = "your-region",
     EnableManagedWorkflow = true,
@@ -117,19 +117,19 @@ To ensure these services are available in your project, add the following to you
 
 ```csharp
 builder
-    .AddCatalystProject("your-desired-project-name")
-    .WithCatalystKvStore("your-desired-kv-name")
-    .WithCatalystPubSub("your-desired-pubsub-name");
+    .AddDiagridProject("your-desired-project-name")
+    .WithDiagridKvStore("your-desired-kv-name")
+    .WithDiagridPubSub("your-desired-pubsub-name");
 ```
 
-With no name, `WithCatalystKvStore()` creates a store called `kvstore`. Pass a name when the store has to match a Dapr state store component your services already address — that is the one line that switching from Dapr OSS costs.
+With no name, `WithDiagridKvStore()` creates a store called `kvstore`. Pass a name when the store has to match a Dapr state store component your services already address — that is the one line that switching from Dapr OSS costs.
 
 ### Components
 
 Diagrid supports [a variety of components](https://docs.diagrid.io/references/components-reference/intro) that you can use
 when building your applications.
 
-Creating a managed KV store or pub/sub through `WithCatalystKvStore` or `WithCatalystPubSub` also creates a component with the same name, so you do not need `WithComponent` for the basic case. Your services can use `your-desired-kv-name` as their state store name straight away. Do not register a component under the same name as the service; that conflicts with the one the CLI creates.
+Creating a managed KV store or pub/sub through `WithDiagridKvStore` or `WithDiagridPubSub` also creates a component with the same name, so you do not need `WithComponent` for the basic case. Your services can use `your-desired-kv-name` as their state store name straight away. Do not register a component under the same name as the service; that conflicts with the one the CLI creates.
 
 If a component already exists under the store's name, the CLI's create can succeed without creating a store. Provisioning detects that and fails, naming the component, instead of carrying on.
 
@@ -137,8 +137,8 @@ Use `WithComponent` for additional or customized components, for example a secon
 
 ```csharp
 builder
-    .AddCatalystProject("your-desired-project-name")
-    .WithCatalystKvStore("your-desired-kv-name")
+    .AddDiagridProject("your-desired-project-name")
+    .WithDiagridKvStore("your-desired-kv-name")
     .WithComponent("your-desired-kv-component", new DiagridStateStore
     {
         Scopes = ["my-project"],
@@ -173,21 +173,21 @@ Generated subscription names are `{app}-pubsub-{topic}`.
 
 ### Agents and the default service names
 
-Adding an agent with `WithCatalystAgent()` has a side effect worth knowing about: creating a project's **first** agent makes Diagrid provision a managed KV store named **`kvstore`** and a managed pub/sub named **`pubsub`** to back the agent registry — the same two names `WithCatalystKvStore()` and `WithCatalystPubSub()` default to. Two consequences:
+Adding an agent with `WithDiagridAgent()` has a side effect worth knowing about: creating a project's **first** agent makes Diagrid provision a managed KV store named **`kvstore`** and a managed pub/sub named **`pubsub`** to back the agent registry — the same two names `WithDiagridKvStore()` and `WithDiagridPubSub()` default to. Two consequences:
 
 - **Those services are created without a fronting component.** A later `kv create kvstore` is refused as "already exists", which `--ignore-if-exists` reports as success, so the component your app addresses would never appear. This integration detects that and creates the missing component itself, so `SaveStateAsync("kvstore", …)` works either way. You do not need to do anything.
 - **They count against your plan's per-project limits.** If your organization allows one KV store per project, the agent's `kvstore` is it, and asking for a second under a different name fails with a quota error naming the region. Either reuse the default name or raise the limit with Diagrid support.
 
 ### Actor state stores
 
-`WithCatalystKvStore()` does not set `actorStateStore`. With `EnableManagedWorkflow = true`, Diagrid already provisions a `workflows-state` store carrying `actorStateStore: "true"` (set in the Diagrid control plane's project controller), and the sidecar picks the first in-scope flagged store by map iteration order. A second flagged store would make that choice arbitrary.
+`WithDiagridKvStore()` does not set `actorStateStore`. With `EnableManagedWorkflow = true`, Diagrid already provisions a `workflows-state` store carrying `actorStateStore: "true"` (set in the Diagrid control plane's project controller), and the sidecar picks the first in-scope flagged store by map iteration order. A second flagged store would make that choice arbitrary.
 
 If you want your own store to hold actor state, opt in explicitly through `DiagridStateStore`:
 
 ```csharp
 builder
-    .AddCatalystProject("your-project")
-    .WithCatalystKvStore("your-kv")
+    .AddDiagridProject("your-project")
+    .WithDiagridKvStore("your-kv")
     .WithComponent("your-actor-state", new DiagridStateStore
     {
         Scopes = ["your-app"],
@@ -240,6 +240,49 @@ Every run compares what the AppHost declares against what is in Diagrid. What ha
 **Create-only** means a change you make in the AppHost is **ignored** if the resource already exists, and the run still succeeds. To change a region, a body size or another project setting, delete the resource and let the AppHost create it again.
 
 `EnableWorkflowHistorySigning` is the one to watch. It can only be chosen when the project is created and cannot be changed afterwards, so setting it against an existing project silently does nothing.
+
+## What is still called Catalyst
+
+The rename stopped deliberately at these, and a find-and-replace over them breaks things:
+
+- **`diagrid product use catalyst`.** The word selects the CLI's product, not ours. The platform still
+  has a Catalyst product, so changing this string makes provisioning fail at run time, on a developer's
+  machine, with an unknown-product error. `PreflightTests` pins the exact arguments.
+- **The `catalyst.*.diagrid.io` console hosts.** Diagrid's own domains. They change when Diagrid
+  changes them, not when this package does.
+- **`tests/fixtures/**`.** Captured CLI output and prose. A diff there means a change reached the wire.
+- **The release notes below.** They record what earlier versions renamed. Rewriting them would make them
+  describe renames that never happened.
+- **`PackageTags`.** It still carries `catalyst`, so a search for the old name finds the new package.
+- **The `CATALYST_API_KEY` repository secret**, until a maintainer renames it. Not to `DIAGRID_API_KEY`:
+  the Diagrid CLI reads that name itself.
+
+## Upgrading to the Diagrid rename
+
+The package is now **`Diagrid.Aspire.Hosting`**. `Diagrid.Aspire.Hosting.Catalyst` is deprecated and
+will not get further versions.
+
+Every public name follows the same rule: Diagrid in place of Catalyst. `AddCatalystProject` is
+`AddDiagridProject`, `WithCatalystApp` is `WithDiagridApp`, and so on. The old method names still work
+for this one minor release, marked `[Obsolete]` with a message naming the replacement, and go in the
+next one.
+
+**Two types have no compatibility form.** `CatalystProject` is `DiagridProject` and
+`CliCatalystProvisioner` is `CliDiagridProvisioner`, with no obsolete alias, because
+`IResourceBuilder<T>` is invariant and an obsolete base would not satisfy code expecting the old type.
+If you name either in a variable declaration, edit it. `CatalystCliException`,
+`ICatalystProvisioner`, `ICatalystComponent` and `ICatalystComponent<TMetadata>` all do have one, so an
+existing `catch` or implementation still compiles.
+
+**Provisioned resources are renamed.** A project resource is now `diagrid-{projectName}` and its proxy
+`{name}-diagrid-proxy`. The suffix is one character shorter, so the longest usable project name goes
+from 49 to 50.
+
+**The demo creates a new project.** `DefaultProjectName` is now `diagrid-aspire-demo`. If you have run
+the demo before, your old `catalyst-aspire-demo` project is still in your Diagrid account and nothing
+will use it again: delete it.
+
+**Environment variables take the `DIAGRID_` prefix**, including `USE_DIAGRID` in the demo.
 
 ## Upgrading from 1.x to 2.0
 
@@ -300,7 +343,7 @@ A find-and-replace of `CatalystProvisioner` → `ICatalystProvisioner` plus the 
 
 ## How to Release
 
-The package is published to [NuGet.org](https://www.nuget.org/packages/Diagrid.Aspire.Hosting.Catalyst) by `.github/workflows/release.yaml`. There is one way to publish: **publish a GitHub Release**. The release's tag name becomes the package version verbatim.
+The package is published to [NuGet.org](https://www.nuget.org/packages/Diagrid.Aspire.Hosting) by `.github/workflows/release.yaml`. There is one way to publish: **publish a GitHub Release**. The release's tag name becomes the package version verbatim.
 
 ### Choosing the version
 
@@ -328,10 +371,10 @@ Renaming `CatalystProvisioner` to `ICatalystProvisioner` and adding the `Async` 
 - **The push does not use `--skip-duplicate`.** If the version already exists the job fails, rather than going green and leaving you believing you shipped.
 - **Nothing publishes except a published release.** `workflow_dispatch` is pack-and-upload only. It used to push as well, which is how the placeholder version `0.0.0-development` reached NuGet.org.
 - **The release needs the `NUGET_API_KEY` secret** to be present and unexpired. NuGet.org API keys expire; a push failing with a 401 usually means the key needs regenerating.
-- **The package is MIT licensed.** The `LICENSE` file at the repo root and `PackageLicenseExpression` in `Hosting.Catalyst/Hosting.Catalyst.csproj` must stay in agreement — GitHub reads the first, NuGet.org renders the second.
+- **The package is MIT licensed.** The `LICENSE` file at the repo root and `PackageLicenseExpression` in `Hosting.Diagrid/Hosting.Diagrid.csproj` must stay in agreement — GitHub reads the first, NuGet.org renders the second.
 
 ## Additional Resources
 
 See an example of this integration being used in the [Diagrid Workflows demo](https://github.com/diagrid-labs/diagrid-order-workflow-dotnet).
 
-In the `AppHost` demo in this repository, the OSS side of the `USE_CATALYST` switch keeps workflow state and order state in one **in-memory** store. Workflows are **not durable across a sidecar restart there**. The crash-and-resume demonstration only works on the Diagrid side.
+In the `AppHost` demo in this repository, the OSS side of the `USE_DIAGRID` switch keeps workflow state and order state in one **in-memory** store. Workflows are **not durable across a sidecar restart there**. The crash-and-resume demonstration only works on the Diagrid side.

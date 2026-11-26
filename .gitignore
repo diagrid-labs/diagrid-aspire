@@ -494,5 +494,5 @@ nuget/
 .claude/
 
 # Specs, plans and working notes kept beside the code but not shipped with it. Root-scoped on purpose: a bare
-# `docs` pattern would also swallow a future Hosting.Catalyst/docs/ that someone did mean to commit.
+# `docs` pattern would also swallow a future Hosting.Diagrid/docs/ that someone did mean to commit.
 /docs/

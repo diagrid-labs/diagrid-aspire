@@ -1,0 +1,10 @@
+namespace Diagrid.Aspire.Hosting.Model;
+
+/// <summary>
+/// The kind of Diagrid identity a resource is backed by.
+/// </summary>
+public enum IdentityKind
+{
+    App,
+    Agent
+}
