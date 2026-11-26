@@ -69,10 +69,10 @@ internal sealed class DiagridLifecycleHandler(
     {
         // A constant template with the art as an argument: concatenating it in would make every run its own
         // template, and ASCII art is exactly the kind of string that can contain brace characters.
-        // Guarded because PickRandomLogo reads an embedded resource, which is wasted work if Information is off.
+        // Guarded because PickLogo reads an embedded resource, which is wasted work if Information is off.
         if (_logger.IsEnabled(LogLevel.Information))
         {
-            _logger.LogInformation("{Logo}", "\n" + LogoPicker.PickRandomLogo() + "\n");
+            _logger.LogInformation("{Logo}", "\n" + LogoPicker.PickLogo() + "\n");
         }
 
         _logger.LogInformation("Welcome to the Diagrid Aspire integration!");
