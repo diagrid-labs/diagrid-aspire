@@ -13,7 +13,7 @@
       <PackageReference Include="CommunityToolkit.Aspire.Hosting.Dapr" />
       <!--
            Deliberately versionless: central package management supplies the version from
-           Directory.Packages.props. Running the demo at the floor Hosting.Catalyst declares is the point:
+           Directory.Packages.props. Running the demo at the floor Hosting.Diagrid declares is the point:
            it is the minimum a consumer gets, and nothing else exercises it.
 
            That floor is 17.0.0, the current release. It is also comfortably above
@@ -30,7 +30,7 @@
       <PackageReference Include="Aspire.Hosting.AppHost" />
       <!-- AddDotnetProject lives here. Project v2 replaced AddProject<TProject> in Aspire 17. -->
       <PackageReference Include="Aspire.Hosting.Dotnet" />
-      <ProjectReference Include="..\Hosting.Catalyst\Hosting.Catalyst.csproj" />
+      <ProjectReference Include="..\Hosting.Diagrid\Hosting.Diagrid.csproj" />
       <!--
            Build ordering only. AddDotnetProject starts TestApi from its path, so the AppHost does not
            compile against its assembly, but the project still has to be built before the demo runs.

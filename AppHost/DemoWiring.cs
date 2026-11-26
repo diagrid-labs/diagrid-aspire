@@ -3,7 +3,7 @@ using Aspire.Hosting;
 using Aspire.Hosting.ApplicationModel;
 using Aspire.Hosting.Dotnet;
 using CommunityToolkit.Aspire.Hosting.Dapr;
-using Diagrid.Aspire.Hosting.Catalyst;
+using Diagrid.Aspire.Hosting;
 using Microsoft.Extensions.Configuration;
 
 namespace Diagrid.Aspire.Test.AppHost;
@@ -26,7 +26,7 @@ public static class DemoWiring
     ///     then hold a second under a different name. Matching the default keeps the demo inside that cap and
     ///     still leaves the service code identical on both sides.
     /// </summary>
-    public const string StateStoreName = Diagrid.Aspire.Hosting.Catalyst.ResourceBuilderExtensions.SampleKvName;
+    public const string StateStoreName = Diagrid.Aspire.Hosting.ResourceBuilderExtensions.SampleKvName;
 
     /// <param name="projectPath">
     ///     Path to the API project, relative to the AppHost directory or absolute. Aspire 17 has no generic

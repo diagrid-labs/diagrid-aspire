@@ -1,6 +1,6 @@
 # Diagrid Aspire Integration
 
-![NuGet Version](https://img.shields.io/nuget/v/Diagrid.Aspire.Hosting.Catalyst)
+![NuGet Version](https://img.shields.io/nuget/v/Diagrid.Aspire.Hosting)
 
 This integration allows you to seamlessly connect your locally running Aspire projects to live Diagrid infrastructure.
 
@@ -43,12 +43,12 @@ diagrid login
 
 ### 3 - Add the integration to your AppHost project
 
-You can find [the package on NuGet](https://www.nuget.org/packages/Diagrid.Aspire.Hosting.Catalyst).
+You can find [the package on NuGet](https://www.nuget.org/packages/Diagrid.Aspire.Hosting).
 
 Add the package by running:
 
 ```bash
-dotnet add package Diagrid.Aspire.Hosting.Catalyst
+dotnet add package Diagrid.Aspire.Hosting
 ```
 
 ### 4 - Configure your AppHost
@@ -300,7 +300,7 @@ A find-and-replace of `CatalystProvisioner` → `ICatalystProvisioner` plus the 
 
 ## How to Release
 
-The package is published to [NuGet.org](https://www.nuget.org/packages/Diagrid.Aspire.Hosting.Catalyst) by `.github/workflows/release.yaml`. There is one way to publish: **publish a GitHub Release**. The release's tag name becomes the package version verbatim.
+The package is published to [NuGet.org](https://www.nuget.org/packages/Diagrid.Aspire.Hosting) by `.github/workflows/release.yaml`. There is one way to publish: **publish a GitHub Release**. The release's tag name becomes the package version verbatim.
 
 ### Choosing the version
 
@@ -328,7 +328,7 @@ Renaming `CatalystProvisioner` to `ICatalystProvisioner` and adding the `Async` 
 - **The push does not use `--skip-duplicate`.** If the version already exists the job fails, rather than going green and leaving you believing you shipped.
 - **Nothing publishes except a published release.** `workflow_dispatch` is pack-and-upload only. It used to push as well, which is how the placeholder version `0.0.0-development` reached NuGet.org.
 - **The release needs the `NUGET_API_KEY` secret** to be present and unexpired. NuGet.org API keys expire; a push failing with a 401 usually means the key needs regenerating.
-- **The package is MIT licensed.** The `LICENSE` file at the repo root and `PackageLicenseExpression` in `Hosting.Catalyst/Hosting.Catalyst.csproj` must stay in agreement — GitHub reads the first, NuGet.org renders the second.
+- **The package is MIT licensed.** The `LICENSE` file at the repo root and `PackageLicenseExpression` in `Hosting.Diagrid/Hosting.Diagrid.csproj` must stay in agreement — GitHub reads the first, NuGet.org renders the second.
 
 ## Additional Resources
 

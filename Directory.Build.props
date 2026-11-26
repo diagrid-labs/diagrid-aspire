@@ -16,7 +16,7 @@
         The shipped package is the strict one: a warning fails its build so the public surface cannot drift again.
         Test and demo projects stay on warnings, because a noisy analyzer should never block running the tests.
     -->
-    <PropertyGroup Condition="'$(MSBuildProjectName)' == 'Hosting.Catalyst'">
+    <PropertyGroup Condition="'$(MSBuildProjectName)' == 'Hosting.Diagrid'">
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <!-- CS1591 (missing XML doc on a public member) is a separate cleanup; documented members are the norm here. -->

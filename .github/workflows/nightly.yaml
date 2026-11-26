@@ -85,7 +85,7 @@ jobs:
       # Build first, with the real HOME and no credential in reach.
       - name: "Build"
         if: steps.gate.outputs.enabled == 'true'
-        run: dotnet build tests/Hosting.Catalyst.SmokeTests
+        run: dotnet build tests/Hosting.Diagrid.SmokeTests
 
       # Every step that touches the account (login, smoke, capture, schemas, sweep) runs with HOME and
       # XDG_CONFIG_HOME pointing at one throwaway directory. `diagrid login` persists its credential under the
@@ -123,7 +123,7 @@ jobs:
           HOME: ${{ runner.temp }}/catalyst-home
           XDG_CONFIG_HOME: ${{ runner.temp }}/catalyst-home/.config
         run: |
-          dotnet test tests/Hosting.Catalyst.SmokeTests --no-build --filter "FullyQualifiedName~SmokeTests.SmokeTests" \
+          dotnet test tests/Hosting.Diagrid.SmokeTests --no-build --filter "FullyQualifiedName~SmokeTests.SmokeTests" \
             --logger "trx;LogFileName=smoke.trx" --results-directory "$RUNNER_TEMP/smoke-results"
           bash .github/scripts/assert-tests-ran.sh "$RUNNER_TEMP/smoke-results"
 
@@ -136,7 +136,7 @@ jobs:
           HOME: ${{ runner.temp }}/catalyst-home
           XDG_CONFIG_HOME: ${{ runner.temp }}/catalyst-home/.config
         run: |
-          dotnet test tests/Hosting.Catalyst.SmokeTests --no-build --filter "FullyQualifiedName~FixtureCapture" \
+          dotnet test tests/Hosting.Diagrid.SmokeTests --no-build --filter "FullyQualifiedName~FixtureCapture" \
             --logger "trx;LogFileName=capture.trx" --results-directory "$RUNNER_TEMP/capture-results"
           bash .github/scripts/assert-tests-ran.sh "$RUNNER_TEMP/capture-results"
 

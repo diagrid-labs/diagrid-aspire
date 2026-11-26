@@ -44,13 +44,13 @@ jobs:
       # Nothing shipped without the suite that guards it. The same three suites CI runs, so a red main cannot
       # become a published package. The account-backed smoke tests skip without CATALYST_SMOKE_ENABLED.
       - name: "Unit tests"
-        run: dotnet test tests/Hosting.Catalyst.Tests --no-build
+        run: dotnet test tests/Hosting.Diagrid.Tests --no-build
 
       - name: "Integration tests"
-        run: dotnet test tests/Hosting.Catalyst.IntegrationTests --no-build
+        run: dotnet test tests/Hosting.Diagrid.IntegrationTests --no-build
 
       - name: "Smoke tests (account-backed tests must skip)"
-        run: dotnet test tests/Hosting.Catalyst.SmokeTests --no-build
+        run: dotnet test tests/Hosting.Diagrid.SmokeTests --no-build
 
       # The tag name becomes the package version verbatim, so it is validated here rather than discovered on
       # nuget.org: a version can never be republished, and a typo is permanent.
@@ -74,7 +74,7 @@ jobs:
           echo "Packing version $version"
 
       - name: "Pack NuGet package"
-        working-directory: ./Hosting.Catalyst
+        working-directory: ./Hosting.Diagrid
         run: dotnet pack --configuration Release --output ./nupkg /p:PackageVersion=${{ steps.choose_version.outputs.version }}
 
       # Always produced, so a dispatch run leaves something inspectable instead of nothing.
@@ -84,14 +84,14 @@ jobs:
           name: nupkg-${{ steps.choose_version.outputs.version }}
           # '*.*nupkg', not '*.nupkg': the latter does not glob '.snupkg', so widening this is the only
           # thing that lets the symbols package leave CI. Easy to undo by accident; a test pins it.
-          path: ./Hosting.Catalyst/nupkg/*.*nupkg
+          path: ./Hosting.Diagrid/nupkg/*.*nupkg
           if-no-files-found: error
 
       # No --skip-duplicate: a version that already exists means this release was already published, and that
       # should fail the job rather than pass silently and leave someone believing they shipped.
       - name: "Publish to NuGet.org"
         if: steps.choose_version.outputs.publish == 'true'
-        working-directory: ./Hosting.Catalyst
+        working-directory: ./Hosting.Diagrid
         run: dotnet nuget push ./nupkg/*.nupkg --source "https://api.nuget.org/v3/index.json" --api-key ${{ secrets.NUGET_API_KEY }}
 
       - name: "Dry run summary"
