@@ -10,11 +10,11 @@ public class SubscriptionTests
 {
     private static readonly Regex DnsLabel = new(@"^[a-z0-9]([-a-z0-9]*[a-z0-9])?\z", RegexOptions.CultureInvariant);
 
-    private static CatalystProject Build(Action<IResourceBuilder<ExecutableResource>> configure)
+    private static DiagridProject Build(Action<IResourceBuilder<ExecutableResource>> configure)
     {
         var builder = DistributedApplication.CreateBuilder();
-        var catalyst = builder.AddCatalystProject("demo");
-        var app = builder.AddExecutable("test-api", "dotnet", ".").WithCatalystApp();
+        var catalyst = builder.AddDiagridProject("demo");
+        var app = builder.AddExecutable("test-api", "dotnet", ".").WithDiagridApp();
         configure(app);
         return catalyst.Resource;
     }
@@ -50,7 +50,7 @@ public class SubscriptionTests
     [InlineData("Ünïcode/Topic", "test-api-pubsub-n-code-topic")]
     public void Sanitises_the_topic_into_a_dns_label(string topic, string expected)
     {
-        var name = CatalystNames.SubscriptionName("test-api", "pubsub", topic);
+        var name = DiagridNames.SubscriptionName("test-api", "pubsub", topic);
 
         Assert.Equal(expected, name);
         Assert.Matches(DnsLabel, name);
@@ -59,7 +59,7 @@ public class SubscriptionTests
     // Mutation: swap two arguments in the format string -> the distinct values land in the wrong order.
     [Fact]
     public void Resource_component_and_topic_appear_in_that_order()
-        => Assert.Equal("web-events-orders", CatalystNames.SubscriptionName("web", "events", "orders"));
+        => Assert.Equal("web-events-orders", DiagridNames.SubscriptionName("web", "events", "orders"));
 
     [Fact]
     public void A_name_over_63_characters_is_truncated_with_a_stable_hash_and_stays_a_dns_label()
@@ -67,9 +67,9 @@ public class SubscriptionTests
         var topic1 = new string('t', 80) + "-one";
         var topic2 = new string('t', 80) + "-two";
 
-        var a = CatalystNames.SubscriptionName("test-api", "pubsub", topic1);
-        var again = CatalystNames.SubscriptionName("test-api", "pubsub", topic1);
-        var b = CatalystNames.SubscriptionName("test-api", "pubsub", topic2);
+        var a = DiagridNames.SubscriptionName("test-api", "pubsub", topic1);
+        var again = DiagridNames.SubscriptionName("test-api", "pubsub", topic1);
+        var b = DiagridNames.SubscriptionName("test-api", "pubsub", topic2);
 
         Assert.True(a.Length <= 63);
         Assert.Equal(a, again);
@@ -82,14 +82,14 @@ public class SubscriptionTests
     // HashCode.Combine) would make every launch miss the existing subscription and create another, delivering N times.
     [Fact]
     public void A_truncated_name_is_pinned_to_a_golden_value()
-        => Assert.Equal("test-api-pubsub-tttttttttttttttttttttttttttttttttttttt-53fb7769", CatalystNames.SubscriptionName("test-api", "pubsub", new string('t', 80) + "-one"));
+        => Assert.Equal("test-api-pubsub-tttttttttttttttttttttttttttttttttttttt-53fb7769", DiagridNames.SubscriptionName("test-api", "pubsub", new string('t', 80) + "-one"));
 
     [Fact]
     public void Truncation_never_leaves_a_trailing_dash_before_the_hash()
     {
         // Index 53 of the sanitised label is a dash, the last character kept by the cut.
         var topic = new string('t', 37) + "-" + new string('u', 40);
-        var name = CatalystNames.SubscriptionName("test-api", "pubsub", topic);
+        var name = DiagridNames.SubscriptionName("test-api", "pubsub", topic);
 
         Assert.DoesNotContain("--", name, StringComparison.Ordinal);
         Assert.Matches(DnsLabel, name);
@@ -100,7 +100,7 @@ public class SubscriptionTests
     public void A_name_of_exactly_63_characters_is_kept_whole()
     {
         var topic = new string('t', 63 - "test-api-pubsub-".Length);
-        var name = CatalystNames.SubscriptionName("test-api", "pubsub", topic);
+        var name = DiagridNames.SubscriptionName("test-api", "pubsub", topic);
 
         Assert.Equal($"test-api-pubsub-{topic}", name);
         Assert.Equal(63, name.Length);

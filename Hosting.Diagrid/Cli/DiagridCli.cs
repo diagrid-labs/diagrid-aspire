@@ -5,7 +5,7 @@ using System.ComponentModel;
 namespace Diagrid.Aspire.Hosting.Cli;
 
 /// <summary>What this integration requires of the installed <c>diagrid</c> CLI, and the actionable failures for when it falls short.</summary>
-internal static class CatalystCli
+internal static class DiagridCli
 {
     /// <summary>
     /// A LOWER BOUND on the CLI release, not a verified-compatible list. It is empirically derived, not
@@ -22,7 +22,7 @@ internal static class CatalystCli
 
     internal const string DocsUrl = "https://docs.diagrid.io";
 
-    internal static CatalystCliException NotInstalled(IReadOnlyList<string> arguments, Win32Exception inner)
+    internal static DiagridCliException NotInstalled(IReadOnlyList<string> arguments, Win32Exception inner)
         => new(
             arguments,
             -1,
@@ -31,7 +31,7 @@ internal static class CatalystCli
                 + $"Diagrid CLI, make sure it is on your PATH, and restart the AppHost. Installation instructions: {DocsUrl}",
             inner);
 
-    internal static CatalystCliException NotLoggedIn(IReadOnlyList<string> arguments, int exitCode, string cleanedStdErr)
+    internal static DiagridCliException NotLoggedIn(IReadOnlyList<string> arguments, int exitCode, string cleanedStdErr)
     {
         var message = "You are not signed in to Diagrid. Run 'diagrid login' in a terminal, then restart the AppHost.";
         if (!string.IsNullOrWhiteSpace(cleanedStdErr))
@@ -46,7 +46,7 @@ internal static class CatalystCli
         => $"Could not work out which version of the diagrid CLI is installed ({detail}), so the minimum-version check ({MinimumVersion}) was skipped. "
             + $"Continuing anyway: if a command later fails with an unknown flag, upgrade the CLI ({DocsUrl}).";
 
-    internal static CatalystCliException TooOld(IReadOnlyList<string> arguments, string found)
+    internal static DiagridCliException TooOld(IReadOnlyList<string> arguments, string found)
         => new(
             arguments,
             0,

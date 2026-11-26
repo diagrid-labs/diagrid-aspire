@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Diagrid.Aspire.Hosting.Cli;
 
-public class CliCatalystProvisioner : ICatalystProvisioner
+public class CliDiagridProvisioner : IDiagridProvisioner
 {
     public async Task InitializeAsync(ILogger logger, CancellationToken cancellationToken = default)
     {
@@ -19,9 +19,9 @@ public class CliCatalystProvisioner : ICatalystProvisioner
         // Best-effort courtesy: every command passes --project explicitly, so nothing depends on this succeeding.
         try
         {
-            await Commands.UseCatalystAsync(cancellationToken);
+            await Commands.UseDiagridAsync(cancellationToken);
         }
-        catch (CatalystCliException)
+        catch (DiagridCliException)
         {
         }
     }
@@ -76,7 +76,7 @@ public class CliCatalystProvisioner : ICatalystProvisioner
         {
             await Commands.UseProjectAsync(projectName, cancellationToken);
         }
-        catch (CatalystCliException)
+        catch (DiagridCliException)
         {
         }
     }
@@ -210,10 +210,10 @@ public class CliCatalystProvisioner : ICatalystProvisioner
     public Task<bool> PubSubExistsAsync(string name, string projectName, CancellationToken cancellationToken)
         => Commands.PubSubExistsAsync(name, projectName, cancellationToken);
 
-    private static CatalystCliException CollisionException(string noun, string name, string project)
+    private static DiagridCliException CollisionException(string noun, string name, string project)
     {
         var kind = noun == "kv" ? "KV store" : "pub/sub broker";
-        return new CatalystCliException(
+        return new DiagridCliException(
             [noun, "get", name, "--project", project],
             0,
             string.Empty,

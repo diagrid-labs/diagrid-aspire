@@ -13,11 +13,11 @@ internal static class HandlerHarness
     /// <summary>Scenario responses that let the CLI preflight (version, then whoami) pass, for tests of later steps.</summary>
     internal static FakeDiagrid.ScenarioResponse[] PreflightPasses() =>
     [
-        new() { ArgsMatch = "version", StdOut = $"Version: {CatalystCli.MinimumVersion}\n" },
+        new() { ArgsMatch = "version", StdOut = $"Version: {DiagridCli.MinimumVersion}\n" },
         new() { ArgsMatch = "whoami", StdOut = "marc@example.com\n" },
     ];
 
-    internal static (CatalystProject Project, CatalystLifecycleHandler Handler, StateRecorder States) Build()
+    internal static (DiagridProject Project, DiagridLifecycleHandler Handler, StateRecorder States) Build()
     {
         var (project, handler, states, _) = BuildWithLogs();
         return (project, handler, states);
@@ -44,10 +44,10 @@ internal static class HandlerHarness
         }
     }
 
-    internal static (CatalystProject Project, CatalystLifecycleHandler Handler, StateRecorder States, LogRecorder Logs) BuildWithLogs(
-        Action<CatalystProject>? configure = null)
+    internal static (DiagridProject Project, DiagridLifecycleHandler Handler, StateRecorder States, LogRecorder Logs) BuildWithLogs(
+        Action<DiagridProject>? configure = null)
     {
-        var project = new CatalystProject { ProjectName = "demo" };
+        var project = new DiagridProject { ProjectName = "demo" };
         configure?.Invoke(project);
         var loggerService = new ResourceLoggerService();
         var notifications = new ResourceNotificationService(
@@ -55,7 +55,7 @@ internal static class HandlerHarness
             new HostLifetimeStub(),
             new EmptyServiceProvider(),
             loggerService);
-        var handler = new CatalystLifecycleHandler(project, loggerService, notifications, new CliCatalystProvisioner());
+        var handler = new DiagridLifecycleHandler(project, loggerService, notifications, new CliDiagridProvisioner());
 
         return (project, handler, new StateRecorder(notifications), new LogRecorder(loggerService, project));
     }

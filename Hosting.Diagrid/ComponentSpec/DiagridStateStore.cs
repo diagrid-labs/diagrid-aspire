@@ -5,7 +5,7 @@ namespace Diagrid.Aspire.Hosting.ComponentSpec;
 
 // see: https://docs.diagrid.io/references/components-reference/state/diagrid/
 
-public class DiagridStateStore : ICatalystComponent<DiagridStateSpecMetadata>
+public class DiagridStateStore : IDiagridComponent<DiagridStateSpecMetadata>
 {
     public string Type => "state.diagrid";
 

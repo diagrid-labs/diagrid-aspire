@@ -11,10 +11,10 @@ namespace Diagrid.Aspire.Hosting;
 ///     commands) and nothing more general: it is not a provisioning abstraction, so do not implement it expecting to
 ///     target a different backend. Member shapes (including the several conventions for passing the project) follow
 ///     the CLI commands they wrap. Some members exist for implementers and are not called by
-///     <c>CatalystLifecycleHandler</c> itself: <see cref="TryGetProjectDetailsAsync"/>, <see cref="KvStoreExistsAsync"/> and
+///     <c>DiagridLifecycleHandler</c> itself: <see cref="TryGetProjectDetailsAsync"/>, <see cref="KvStoreExistsAsync"/> and
 ///     <see cref="PubSubExistsAsync"/>.
 /// </summary>
-public interface ICatalystProvisioner
+public interface IDiagridProvisioner
 {
     /// <summary>
     ///     In case any provisioner requires some setup, fine to noop.

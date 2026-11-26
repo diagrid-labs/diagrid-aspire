@@ -66,7 +66,7 @@ public class ProcessRunnerTests
         // The runner closes stdin, so a stdin-reading fake would see EOF and exit; hang by sleeping instead.
         fake.SetScenario(Single(new() { SleepMilliseconds = 120_000 }));
 
-        var ex = await Assert.ThrowsAsync<CatalystCliException>(
+        var ex = await Assert.ThrowsAsync<DiagridCliException>(
             () => Run(["project", "get", "demo"], TimeSpan.FromSeconds(2)));
 
         Assert.Contains("project get", ex.Message);

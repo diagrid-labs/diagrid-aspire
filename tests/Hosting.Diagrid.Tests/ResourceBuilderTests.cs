@@ -9,10 +9,10 @@ namespace Hosting.Diagrid.Tests;
 public class ResourceBuilderTests
 {
     [Fact]
-    public void WithCatalyst_and_WithCatalystApp_produce_identical_resource_graphs()
+    public void WithDiagrid_and_WithDiagridApp_produce_identical_resource_graphs()
     {
-        var viaAlias = GraphOf(b => b.WithCatalyst());
-        var viaApp = GraphOf(b => b.WithCatalystApp());
+        var viaAlias = GraphOf(b => b.WithDiagrid());
+        var viaApp = GraphOf(b => b.WithDiagridApp());
 
         Assert.NotEmpty(viaApp);
         Assert.Equal(viaAlias, viaApp);
@@ -45,8 +45,8 @@ public class ResourceBuilderTests
     public void Passes_app_port_to_dev_run_for_a_resource_with_an_http_endpoint()
     {
         var builder = DistributedApplication.CreateBuilder();
-        var catalyst = builder.AddCatalystProject("demo");
-        builder.AddContainer("api", "img").WithHttpEndpoint(targetPort: 8080).WithCatalystApp();
+        var catalyst = builder.AddDiagridProject("demo");
+        builder.AddContainer("api", "img").WithHttpEndpoint(targetPort: 8080).WithDiagridApp();
 
         var args = DevRunArgsFor(catalyst.Resource, "api");
 
@@ -60,8 +60,8 @@ public class ResourceBuilderTests
     public void Dev_run_argv_for_a_resource_with_an_http_endpoint_is_exactly_as_expected()
     {
         var builder = DistributedApplication.CreateBuilder();
-        var catalyst = builder.AddCatalystProject("demo");
-        builder.AddContainer("api", "img").WithHttpEndpoint(targetPort: 8080).WithCatalystApp();
+        var catalyst = builder.AddDiagridProject("demo");
+        builder.AddContainer("api", "img").WithHttpEndpoint(targetPort: 8080).WithDiagridApp();
 
         Assert.Equal(
             [
@@ -88,10 +88,10 @@ public class ResourceBuilderTests
     public void Rejects_an_invalid_resource_name_at_registration_naming_the_resource()
     {
         var builder = DistributedApplication.CreateBuilder();
-        builder.AddCatalystProject("demo");
+        builder.AddDiagridProject("demo");
         var bad = builder.AddExecutable("TestApi", "dotnet", ".");
 
-        var ex = Assert.Throws<ArgumentException>(() => bad.WithCatalystApp());
+        var ex = Assert.Throws<ArgumentException>(() => bad.WithDiagridApp());
         Assert.Contains("TestApi", ex.Message, StringComparison.Ordinal);
     }
 
@@ -101,10 +101,10 @@ public class ResourceBuilderTests
     public void Accepts_a_resource_name_whose_proxy_name_is_exactly_at_the_aspire_limit()
     {
         var builder = DistributedApplication.CreateBuilder();
-        var catalyst = builder.AddCatalystProject("demo");
+        var catalyst = builder.AddDiagridProject("demo");
         var name = new string('a', 49);
 
-        builder.AddExecutable(name, "dotnet", ".").WithCatalystApp();
+        builder.AddExecutable(name, "dotnet", ".").WithDiagridApp();
 
         Assert.Single(catalyst.Resource.Identities);
         Assert.Equal(64, $"{name}-catalyst-proxy".Length);
@@ -114,11 +114,11 @@ public class ResourceBuilderTests
     public void Rejects_a_resource_name_whose_proxy_name_exceeds_the_aspire_limit_naming_the_resource()
     {
         var builder = DistributedApplication.CreateBuilder();
-        builder.AddCatalystProject("demo");
+        builder.AddDiagridProject("demo");
         var name = new string('a', 50);
         var resource = builder.AddExecutable(name, "dotnet", ".");
 
-        var ex = Assert.Throws<ArgumentException>(() => resource.WithCatalystApp());
+        var ex = Assert.Throws<ArgumentException>(() => resource.WithDiagridApp());
 
         Assert.Contains($"'{name}'", ex.Message, StringComparison.Ordinal);
         Assert.Contains("too long", ex.Message, StringComparison.Ordinal);
@@ -128,8 +128,8 @@ public class ResourceBuilderTests
     public async Task Environment_callback_resolves_for_a_resource_with_no_http_endpoint()
     {
         var builder = DistributedApplication.CreateBuilder();
-        var catalyst = builder.AddCatalystProject("demo");
-        var worker = builder.AddExecutable("worker", "dotnet", ".").WithCatalystApp();
+        var catalyst = builder.AddDiagridProject("demo");
+        var worker = builder.AddExecutable("worker", "dotnet", ".").WithDiagridApp();
 
         var project = catalyst.Resource;
         project.GrpcEndpoint.SetResult("https://grpc.example");
@@ -154,20 +154,20 @@ public class ResourceBuilderTests
         Assert.Equal("tok", env["DAPR_API_TOKEN"]);
     }
 
-    private static (CatalystProject Project, IResourceBuilder<ExecutableResource> Worker) BuildWorkerWithNoEndpoint()
+    private static (DiagridProject Project, IResourceBuilder<ExecutableResource> Worker) BuildWorkerWithNoEndpoint()
     {
         var builder = DistributedApplication.CreateBuilder();
-        var catalyst = builder.AddCatalystProject("demo");
-        var worker = builder.AddExecutable("worker", "dotnet", ".").WithCatalystApp();
+        var catalyst = builder.AddDiagridProject("demo");
+        var worker = builder.AddExecutable("worker", "dotnet", ".").WithDiagridApp();
         return (catalyst.Resource, worker);
     }
 
-    private static List<string> DevRunArgsFor(CatalystProject project, string resourceName = "worker")
+    private static List<string> DevRunArgsFor(DiagridProject project, string resourceName = "worker")
     {
         return ArgsOf(ProxyOf(project, resourceName));
     }
 
-    private static ExecutableResource ProxyOf(CatalystProject project, string resourceName)
+    private static ExecutableResource ProxyOf(DiagridProject project, string resourceName)
     {
         var owner = project.Identities.Keys.Single(r => r.Name == resourceName);
         var proxy = owner.Annotations.OfType<ResourceRelationshipAnnotation>()
@@ -194,7 +194,7 @@ public class ResourceBuilderTests
     private static List<string> GraphOf(Action<IResourceBuilder<ExecutableResource>> configure)
     {
         var builder = DistributedApplication.CreateBuilder();
-        builder.AddCatalystProject("demo");
+        builder.AddDiagridProject("demo");
         var worker = builder.AddExecutable("worker", "dotnet", ".");
         configure(worker);
 
@@ -207,7 +207,7 @@ public class ResourceBuilderTests
                 lines.Add($"{exe.Name} args: {string.Join(" ", ArgsOf(exe))}");
             }
 
-            if (resource is CatalystProject p)
+            if (resource is DiagridProject p)
             {
                 lines.Add($"identities: {string.Join(",", p.Identities.Select(i => $"{i.Key.Name}:{i.Value.Kind}"))}");
             }

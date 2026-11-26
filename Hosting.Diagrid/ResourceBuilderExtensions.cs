@@ -16,10 +16,10 @@ namespace Diagrid.Aspire.Hosting;
 public static class ResourceBuilderExtensions
 {
     /// <summary>
-    ///     The name <see cref="WithCatalystKvStore(IResourceBuilder{CatalystProject})"/> gives the store it creates.
+    ///     The name <see cref="WithDiagridKvStore(IResourceBuilder{DiagridProject})"/> gives the store it creates.
     ///     It is <c>kvstore</c> because that is what the resource is in Diagrid. Expect to override it: the name has
     ///     to match the Dapr state store component your services already address, so pass your own with
-    ///     <c>WithCatalystKvStore("your-name")</c>. The demo AppHost does exactly that.
+    ///     <c>WithDiagridKvStore("your-name")</c>. The demo AppHost does exactly that.
     /// </summary>
     public const string SampleKvName = "kvstore";
     public const string SamplePubsubName = "pubsub";
@@ -27,14 +27,14 @@ public static class ResourceBuilderExtensions
     /// <summary>
     ///     Associates an Aspire orchestration to a Diagrid project.
     /// </summary>
-    public static IResourceBuilder<CatalystProject> AddCatalystProject(this IDistributedApplicationBuilder applicationBuilder, string? customProjectName = null, ProjectDescriptor? descriptor = null)
+    public static IResourceBuilder<DiagridProject> AddDiagridProject(this IDistributedApplicationBuilder applicationBuilder, string? customProjectName = null, ProjectDescriptor? descriptor = null)
     {
-        applicationBuilder.Services.AddSingleton<ICatalystProvisioner, CliCatalystProvisioner>();
+        applicationBuilder.Services.AddSingleton<IDiagridProvisioner, CliDiagridProvisioner>();
 
         var projectName = ResolveProjectName(customProjectName, Assembly.GetEntryAssembly()?.EntryPoint?.DeclaringType?.Namespace);
 
         // todo: Custom icon, support pending https://github.com/dotnet/aspire/issues/8684
-        var catalystProject = applicationBuilder.AddResource(new CatalystProject
+        var catalystProject = applicationBuilder.AddResource(new DiagridProject
         {
             ProjectName = projectName,
             ProjectDescriptor = descriptor ?? new(),
@@ -54,13 +54,13 @@ public static class ResourceBuilderExtensions
             // note: This is necessary so that anything that has an outstanding .WaitFor will be notified.
             await eventing.PublishAsync(new BeforeResourceStartedEvent(resource, services), cancellationToken);
 
-            await new CatalystLifecycleHandler(
+            await new DiagridLifecycleHandler(
                 resource,
                 initializeResourceEvent.Services.GetRequiredService<ResourceLoggerService>(),
                 initializeResourceEvent.Services.GetRequiredService<ResourceNotificationService>(),
-                initializeResourceEvent.Services.GetRequiredService<ICatalystProvisioner>()
+                initializeResourceEvent.Services.GetRequiredService<IDiagridProvisioner>()
             )
-                .ProvisionCatalystAsync(cancellationToken);
+                .ProvisionDiagridAsync(cancellationToken);
         });
 
         return catalystProject;
@@ -86,7 +86,7 @@ public static class ResourceBuilderExtensions
 
         throw new ArgumentException(
             "The Diagrid project name could not be inferred: the entry point has no namespace, which is the case for an AppHost "
-            + "written with top-level statements. Pass a name explicitly, for example AddCatalystProject(\"my-project\").",
+            + "written with top-level statements. Pass a name explicitly, for example AddDiagridProject(\"my-project\").",
             nameof(customProjectName));
     }
 
@@ -107,11 +107,11 @@ public static class ResourceBuilderExtensions
     }
 
     /// <summary>
-    ///     Configures a resource to use Diagrid. Equivalent to <see cref="WithCatalystApp{TResource}"/>.
+    ///     Configures a resource to use Diagrid. Equivalent to <see cref="WithDiagridApp{TResource}"/>.
     /// </summary>
-    public static IResourceBuilder<TResource> WithCatalyst<TResource>(this IResourceBuilder<TResource> resourceBuilder, IResourceBuilder<CatalystProject>? catalystProjectBuilder = null)
+    public static IResourceBuilder<TResource> WithDiagrid<TResource>(this IResourceBuilder<TResource> resourceBuilder, IResourceBuilder<DiagridProject>? catalystProjectBuilder = null)
     where TResource : Resource, IResourceWithEnvironment, IResourceWithWaitSupport
-        => resourceBuilder.WithCatalystApp(catalystProjectBuilder);
+        => resourceBuilder.WithDiagridApp(catalystProjectBuilder);
 
     /// <summary>
     ///     Configures a resource to run as a Diagrid app. Resources without an HTTP endpoint,
@@ -123,9 +123,9 @@ public static class ResourceBuilderExtensions
     ///     <c>--app-port</c>.
     /// </remarks>
     /// <exception cref="ArgumentException">The Aspire resource name is not a valid Diagrid name.</exception>
-    public static IResourceBuilder<TResource> WithCatalystApp<TResource>(this IResourceBuilder<TResource> resourceBuilder, IResourceBuilder<CatalystProject>? catalystProjectBuilder = null)
+    public static IResourceBuilder<TResource> WithDiagridApp<TResource>(this IResourceBuilder<TResource> resourceBuilder, IResourceBuilder<DiagridProject>? catalystProjectBuilder = null)
     where TResource : Resource, IResourceWithEnvironment, IResourceWithWaitSupport
-        => resourceBuilder.WithCatalystIdentity(IdentityKind.App, nameof(WithCatalystApp), catalystProjectBuilder);
+        => resourceBuilder.WithDiagridIdentity(IdentityKind.App, nameof(WithDiagridApp), catalystProjectBuilder);
 
     /// <summary>
     ///     Configures a resource to run as a Diagrid agent (<c>diagrid agent create</c>) rather than an app. The proxy
@@ -137,21 +137,21 @@ public static class ResourceBuilderExtensions
     ///     depends on the Diagrid deployment: when it has no agent API, provisioning fails naming the resource.
     /// </remarks>
     /// <exception cref="ArgumentException">The Aspire resource name is not a valid Diagrid name.</exception>
-    public static IResourceBuilder<TResource> WithCatalystAgent<TResource>(this IResourceBuilder<TResource> resourceBuilder, IResourceBuilder<CatalystProject>? catalystProjectBuilder = null)
+    public static IResourceBuilder<TResource> WithDiagridAgent<TResource>(this IResourceBuilder<TResource> resourceBuilder, IResourceBuilder<DiagridProject>? catalystProjectBuilder = null)
     where TResource : Resource, IResourceWithEnvironment, IResourceWithWaitSupport
-        => resourceBuilder.WithCatalystIdentity(IdentityKind.Agent, nameof(WithCatalystAgent), catalystProjectBuilder);
+        => resourceBuilder.WithDiagridIdentity(IdentityKind.Agent, nameof(WithDiagridAgent), catalystProjectBuilder);
 
-    private static IResourceBuilder<TResource> WithCatalystIdentity<TResource>(
+    private static IResourceBuilder<TResource> WithDiagridIdentity<TResource>(
         this IResourceBuilder<TResource> resourceBuilder,
         IdentityKind kind,
         string publicMethodName,
-        IResourceBuilder<CatalystProject>? catalystProjectBuilder)
+        IResourceBuilder<DiagridProject>? catalystProjectBuilder)
     where TResource : Resource, IResourceWithEnvironment, IResourceWithWaitSupport
     {
-        CatalystNames.EnsureValidResourceName(resourceBuilder.Resource.Name);
+        DiagridNames.EnsureValidResourceName(resourceBuilder.Resource.Name);
 
         var applicationBuilder = resourceBuilder.ApplicationBuilder;
-        var catalystProjects = applicationBuilder.EnsureCatalystResources();
+        var catalystProjects = applicationBuilder.EnsureDiagridResources();
 
         if (catalystProjects.Count > 1 && catalystProjectBuilder is null)
         {
@@ -202,7 +202,7 @@ public static class ResourceBuilderExtensions
             var applicationModel = (DistributedApplicationModel)context.ExecutionContext.Services
                 .GetRequiredService(typeof(DistributedApplicationModel));
 
-            var catalystProject = applicationModel.Resources.FirstOrDefault((resource) => resource is CatalystProject) as CatalystProject
+            var catalystProject = applicationModel.Resources.FirstOrDefault((resource) => resource is DiagridProject) as DiagridProject
                 ?? throw new InvalidOperationException("This project is missing a Diagrid project resource.");
 
             var appDetails = await catalystProject.Identities[resourceBuilder.Resource].Details.Task;
@@ -276,7 +276,7 @@ public static class ResourceBuilderExtensions
     {
         var applicationBuilder = resourceBuilder.ApplicationBuilder;
         var catalystProject = applicationBuilder
-            .EnsureCatalystResources()
+            .EnsureDiagridResources()
             .FirstOrDefault(project => project.Identities.Any(app => app.Key == resourceBuilder.Resource))
             ?? throw new InvalidOperationException("This resource is not associated with a Diagrid project.");
         var appName = resourceBuilder.Resource.Name;
@@ -327,7 +327,7 @@ public static class ResourceBuilderExtensions
     where TResource : Resource, IResourceWithEnvironment, IResourceWithWaitSupport
     {
         // The topic is part of the name: two topics on one app must not collide on the project's subscription names.
-        var name = CatalystNames.SubscriptionName(resourceBuilder.Resource.Name, SamplePubsubName, topic);
+        var name = DiagridNames.SubscriptionName(resourceBuilder.Resource.Name, SamplePubsubName, topic);
 
         return resourceBuilder.WithSubscription(name, SamplePubsubName, topic, path);
     }
@@ -335,8 +335,8 @@ public static class ResourceBuilderExtensions
     /// <summary>
     ///     Adds a weakly-typed component to the Diagrid project.
     /// </summary>
-    public static IResourceBuilder<CatalystProject> WithComponent(
-        this IResourceBuilder<CatalystProject> catalystProject,
+    public static IResourceBuilder<DiagridProject> WithComponent(
+        this IResourceBuilder<DiagridProject> catalystProject,
         string name,
         string type,
         IDictionary<string, object?> metadata,
@@ -359,10 +359,10 @@ public static class ResourceBuilderExtensions
     /// </summary>
     /// <typeparam name="TMetadata"></typeparam>
     /// <exception cref="Exception"></exception>
-    public static IResourceBuilder<CatalystProject> WithComponent<TMetadata>(
-        this IResourceBuilder<CatalystProject> catalystProject,
+    public static IResourceBuilder<DiagridProject> WithComponent<TMetadata>(
+        this IResourceBuilder<DiagridProject> catalystProject,
         string name,
-        ICatalystComponent<TMetadata> component
+        IDiagridComponent<TMetadata> component
     )
     {
         var metadataSerializerOptions = new JsonSerializerOptions
@@ -391,12 +391,12 @@ public static class ResourceBuilderExtensions
     ///     <br /><br />
     ///     This overload is useful for demos and quick prototyping, it's recommended to use the full overload for your projects.
     ///     <br /><br />
-    ///     See: <see cref="WithCatalystPubSub(IResourceBuilder{CatalystProject}, string, IList{string}?)"/> 
+    ///     See: <see cref="WithDiagridPubSub(IResourceBuilder{DiagridProject}, string, IList{string}?)"/> 
     /// </summary>
-    public static IResourceBuilder<CatalystProject> WithCatalystPubSub(this IResourceBuilder<CatalystProject> catalystProject)
+    public static IResourceBuilder<DiagridProject> WithDiagridPubSub(this IResourceBuilder<DiagridProject> catalystProject)
     {
         // `pubsub create` creates the fronting component itself; registering one here would conflict.
-        return catalystProject.WithCatalystPubSub(SamplePubsubName);
+        return catalystProject.WithDiagridPubSub(SamplePubsubName);
     }
 
     /// <summary>
@@ -404,8 +404,8 @@ public static class ResourceBuilderExtensions
     ///     <br /><br />
     ///     The Diagrid CLI creates the fronting component, named after the store, so this does not add one.
     /// </summary>
-    public static IResourceBuilder<CatalystProject> WithCatalystPubSub(
-        this IResourceBuilder<CatalystProject> catalystProject,
+    public static IResourceBuilder<DiagridProject> WithDiagridPubSub(
+        this IResourceBuilder<DiagridProject> catalystProject,
         string name,
         IList<string>? scopes = null
     )
@@ -435,14 +435,14 @@ public static class ResourceBuilderExtensions
     ///     <br /><br />
     ///     This overload is useful for demos and quick prototyping, it's recommended to use the full overload for your projects.
     ///     <br /><br />
-    ///     See: <see cref="WithCatalystKvStore(IResourceBuilder{CatalystProject}, string, IList{string}?)"/>
+    ///     See: <see cref="WithDiagridKvStore(IResourceBuilder{DiagridProject}, string, IList{string}?)"/>
     /// </summary>
-    public static IResourceBuilder<CatalystProject> WithCatalystKvStore(this IResourceBuilder<CatalystProject> catalystProject)
+    public static IResourceBuilder<DiagridProject> WithDiagridKvStore(this IResourceBuilder<DiagridProject> catalystProject)
     {
         // `kv create` creates the fronting component itself; registering one here would conflict. It does not
         // claim actorStateStore either (the managed workflow state store does); set it explicitly through
         // DiagridStateStore.ActorStateStore if needed.
-        return catalystProject.WithCatalystKvStore(SampleKvName);
+        return catalystProject.WithDiagridKvStore(SampleKvName);
     }
 
     /// <summary>
@@ -450,8 +450,8 @@ public static class ResourceBuilderExtensions
     ///     <br /><br />
     ///     The Diagrid CLI creates the fronting component, named after the store, so this does not add one.
     /// </summary>
-    public static IResourceBuilder<CatalystProject> WithCatalystKvStore(
-        this IResourceBuilder<CatalystProject> catalystProject,
+    public static IResourceBuilder<DiagridProject> WithDiagridKvStore(
+        this IResourceBuilder<DiagridProject> catalystProject,
         string name,
         IList<string>? scopes = null
     )
@@ -479,16 +479,16 @@ public static class ResourceBuilderExtensions
     ///     Ensures the user has configured a Diagrid project as part of their orchestration.
     /// </summary>
     /// <exception cref="Exception"></exception>
-    internal static IList<CatalystProject> EnsureCatalystResources(this IDistributedApplicationBuilder applicationBuilder)
+    internal static IList<DiagridProject> EnsureDiagridResources(this IDistributedApplicationBuilder applicationBuilder)
     {
         var catalystProjectResources = applicationBuilder.Resources
-            .Where((resource) => resource is CatalystProject)
-            .Cast<CatalystProject>()
+            .Where((resource) => resource is DiagridProject)
+            .Cast<DiagridProject>()
             .ToList();
 
         if (catalystProjectResources.Count == 0)
         {
-            throw new InvalidOperationException($"Remember to configure your Diagrid project by calling {nameof(AddCatalystProject)}.");
+            throw new InvalidOperationException($"Remember to configure your Diagrid project by calling {nameof(AddDiagridProject)}.");
         }
 
         return catalystProjectResources;

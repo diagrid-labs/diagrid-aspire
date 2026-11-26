@@ -8,7 +8,7 @@ namespace Diagrid.Aspire.Hosting;
 /// <summary>
 ///     Represents an entire catalyst project and the resources contained within it.
 /// </summary>
-public class CatalystProject : IResource
+public class DiagridProject : IResource
 {
     /// <summary>
     ///     The label of the resource in Aspire. See ProjectName for the label that will be used in Diagrid.
@@ -24,7 +24,7 @@ public class CatalystProject : IResource
     internal TaskCompletionSource<string> HttpEndpoint { get; } = new();
     internal TaskCompletionSource<string> GrpcEndpoint { get; } = new();
     internal ProjectDescriptor ProjectDescriptor { get; init; } = new();
-    internal Dictionary<Resource, CatalystIdentity> Identities { get; init; } = new();
+    internal Dictionary<Resource, DiagridIdentity> Identities { get; init; } = new();
     internal Dictionary<string, PubSubDescriptor> PubSubs { get; init; } = new();
     internal Dictionary<string, KvStoreDescriptor> KvStores { get; init; } = new();
     internal Dictionary<string, ComponentDescriptor> Components { get; init; } = new();
@@ -34,4 +34,4 @@ public class CatalystProject : IResource
 /// <summary>
 ///     A Diagrid identity (app or agent) that an Aspire resource is backed by, and the details resolved once provisioned.
 /// </summary>
-internal record CatalystIdentity(IdentityKind Kind, TaskCompletionSource<AppDetails> Details);
+internal record DiagridIdentity(IdentityKind Kind, TaskCompletionSource<AppDetails> Details);

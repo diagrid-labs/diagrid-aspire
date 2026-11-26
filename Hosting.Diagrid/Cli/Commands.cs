@@ -170,12 +170,12 @@ internal static class Commands
         result.EnsureSuccess(arguments);
     }
 
-    internal static string[] BuildUseCatalystArgs() => ["product", "use", "catalyst"];
+    internal static string[] BuildUseDiagridArgs() => ["product", "use", "catalyst"];
 
     /// <summary>Best-effort courtesy: every other call passes --project, so nothing depends on this.</summary>
-    public static async Task UseCatalystAsync(CancellationToken cancellationToken)
+    public static async Task UseDiagridAsync(CancellationToken cancellationToken)
     {
-        await ProcessRunner.RunAsync(BuildUseCatalystArgs(), ReadTimeout, cancellationToken);
+        await ProcessRunner.RunAsync(BuildUseDiagridArgs(), ReadTimeout, cancellationToken);
     }
 
     // 'diagrid version' has no --output flag (it is rejected as unknown); its plain output is parsed by key.
@@ -194,20 +194,20 @@ internal static class Commands
         {
             result = await ProcessRunner.RunAsync(arguments, ReadTimeout, cancellationToken);
         }
-        catch (CatalystCliException ex) when (ex.InnerException is System.ComponentModel.Win32Exception missing)
+        catch (DiagridCliException ex) when (ex.InnerException is System.ComponentModel.Win32Exception missing)
         {
-            throw CatalystCli.NotInstalled(arguments, missing);
+            throw DiagridCli.NotInstalled(arguments, missing);
         }
 
         if (result.ExitCode != 0)
         {
-            logger.LogWarning("{Message}", CatalystCli.UnreadableVersionWarning($"'diagrid version' exited with code {result.ExitCode}"));
+            logger.LogWarning("{Message}", DiagridCli.UnreadableVersionWarning($"'diagrid version' exited with code {result.ExitCode}"));
             return;
         }
 
-        if (!CatalystCli.EnsureSupportedVersion(arguments, result.StdOut))
+        if (!DiagridCli.EnsureSupportedVersion(arguments, result.StdOut))
         {
-            logger.LogWarning("{Message}", CatalystCli.UnreadableVersionWarning("'diagrid version' printed no recognisable 'Version:' line"));
+            logger.LogWarning("{Message}", DiagridCli.UnreadableVersionWarning("'diagrid version' printed no recognisable 'Version:' line"));
         }
     }
 
@@ -221,7 +221,7 @@ internal static class Commands
 
         if (result.ExitCode != 0)
         {
-            throw CatalystCli.NotLoggedIn(arguments, result.ExitCode, StdErrCleaner.Clean(result.StdErr));
+            throw DiagridCli.NotLoggedIn(arguments, result.ExitCode, StdErrCleaner.Clean(result.StdErr));
         }
     }
 
@@ -548,7 +548,7 @@ internal static class Commands
         }
         catch (JsonException ex) when (result.OutputTruncated)
         {
-            throw new CatalystCliException(
+            throw new DiagridCliException(
                 arguments,
                 result.ExitCode,
                 StdErrCleaner.Clean(result.StdErr),

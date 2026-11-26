@@ -35,15 +35,15 @@ public class CollisionTests
 
     // --- through the provisioner ---
 
-    // Mutation: drop the post-create probe from CliCatalystProvisioner.CreateKvStoreAsync and this no longer throws.
+    // Mutation: drop the post-create probe from CliDiagridProvisioner.CreateKvStoreAsync and this no longer throws.
     [Fact(Timeout = 30_000)]
     public async Task Kv_create_that_succeeded_but_left_no_store_fails_naming_the_colliding_component()
     {
         using var fake = new FakeDiagridFixture();
         fake.SetScenario(KvCreateOkButNoStore());
 
-        var ex = await Assert.ThrowsAsync<CatalystCliException>(
-            () => new CliCatalystProvisioner().CreateKvStoreAsync("statestore", new() { Project = "demo" }, default));
+        var ex = await Assert.ThrowsAsync<DiagridCliException>(
+            () => new CliDiagridProvisioner().CreateKvStoreAsync("statestore", new() { Project = "demo" }, default));
 
         Assert.Contains("statestore", ex.Message, StringComparison.Ordinal);
         Assert.Contains("component", ex.Message, StringComparison.Ordinal);
@@ -58,8 +58,8 @@ public class CollisionTests
         using var fake = new FakeDiagridFixture();
         fake.SetScenario(PubSubCreateOkButNoBroker());
 
-        var ex = await Assert.ThrowsAsync<CatalystCliException>(
-            () => new CliCatalystProvisioner().CreatePubSubAsync("pubsub", new() { Project = "demo" }, default));
+        var ex = await Assert.ThrowsAsync<DiagridCliException>(
+            () => new CliDiagridProvisioner().CreatePubSubAsync("pubsub", new() { Project = "demo" }, default));
 
         Assert.Contains("pubsub", ex.Message, StringComparison.Ordinal);
         Assert.Contains("component", ex.Message, StringComparison.Ordinal);
@@ -71,7 +71,7 @@ public class CollisionTests
     {
         using var fake = new FakeDiagridFixture();
         fake.SetScenario(new Scenario { Responses = [new() { ExitCode = 0 }] });
-        var provisioner = new CliCatalystProvisioner();
+        var provisioner = new CliDiagridProvisioner();
 
         await provisioner.CreateKvStoreAsync("statestore", new() { Project = "demo" }, default);
         await provisioner.CreatePubSubAsync("pubsub", new() { Project = "demo" }, default);
@@ -95,7 +95,7 @@ public class CollisionTests
                 new() { ArgsMatch = "pubsub get absent", ExitCode = 1 },
             ],
         });
-        var provisioner = new CliCatalystProvisioner();
+        var provisioner = new CliDiagridProvisioner();
 
         Assert.True(await provisioner.KvStoreExistsAsync("present", "demo", default));
         Assert.False(await provisioner.KvStoreExistsAsync("absent", "demo", default));
@@ -117,10 +117,10 @@ public class CollisionTests
                 new() { ExitCode = 0 },
             ],
         });
-        var provisioner = new CliCatalystProvisioner();
+        var provisioner = new CliDiagridProvisioner();
 
         await provisioner.CreateKvStoreAsync("kvname", new() { Project = "demo" }, default);
-        var ex = await Assert.ThrowsAsync<CatalystCliException>(
+        var ex = await Assert.ThrowsAsync<DiagridCliException>(
             () => provisioner.CreatePubSubAsync("psname", new() { Project = "demo" }, default));
 
         Assert.Contains("psname", ex.Message, StringComparison.Ordinal);
@@ -143,7 +143,7 @@ public class CollisionTests
         project.KvStores.Add("statestore", new() { Project = "demo" });
         project.PubSubs.Add("pubsub", new() { Project = "demo" });
 
-        await handler.ProvisionCatalystAsync(default);
+        await handler.ProvisionDiagridAsync(default);
 
         var kvCreate = fake.Invocations.ToList().FindIndex(i => i is ["kv", "create", "statestore", ..]);
         var kvGet = fake.Invocations.ToList().FindIndex(i => i is ["kv", "get", "statestore", ..]);
@@ -193,7 +193,7 @@ public class CollisionTests
         project.KvStores.Add("statestore", new() { Project = "demo" });
         project.Components.Add("later", new() { Name = "later", Type = "state.in-memory", Metadata = new Dictionary<string, object?> { ["k"] = "v" } });
 
-        var ex = await Assert.ThrowsAsync<CatalystCliException>(() => handler.ProvisionCatalystAsync(default));
+        var ex = await Assert.ThrowsAsync<DiagridCliException>(() => handler.ProvisionDiagridAsync(default));
         await states.Drain();
 
         Assert.Contains("statestore", ex.Message, StringComparison.Ordinal);

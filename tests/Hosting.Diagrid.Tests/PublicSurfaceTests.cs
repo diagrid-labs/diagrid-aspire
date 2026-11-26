@@ -12,7 +12,7 @@ public class PublicSurfaceTests
     [Fact]
     public void PublicSurfaceIsIdenticalOnEveryTargetFramework()
     {
-        var actual = PublicSurface.Enumerate(typeof(CatalystProject).Assembly);
+        var actual = PublicSurface.Enumerate(typeof(DiagridProject).Assembly);
 
         // Deliberately changed the public API? Regenerate the baseline instead of transcribing it out of an
         // xunit sequence diff, which is how a guard like this ends up deleted. From the repo root:

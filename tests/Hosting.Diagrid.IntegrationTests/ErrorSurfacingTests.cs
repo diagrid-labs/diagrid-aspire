@@ -26,7 +26,7 @@ public class ErrorSurfacingTests
             ],
         });
 
-        var ex = await Assert.ThrowsAsync<CatalystCliException>(
+        var ex = await Assert.ThrowsAsync<DiagridCliException>(
             () => Commands.CreateProjectAsync("demo", new() { Region = "nope" }, default));
 
         Assert.Contains("region nope not found", ex.Message);
@@ -46,8 +46,8 @@ public class ErrorSurfacingTests
             Responses = [new() { ExitCode = 1, StdErr = "Error: configured maximum number of projects reached\n" }],
         });
 
-        var ex = await Assert.ThrowsAsync<CatalystCliException>(
-            () => new CliCatalystProvisioner().CreateProjectAsync("demo", new(), default));
+        var ex = await Assert.ThrowsAsync<DiagridCliException>(
+            () => new CliDiagridProvisioner().CreateProjectAsync("demo", new(), default));
 
         Assert.Contains("maximum number of projects", ex.Message);
     }
@@ -61,7 +61,7 @@ public class ErrorSurfacingTests
             Responses = [new() { ExitCode = 1, StdOut = "project demo already exists", StdErr = "Error: already exists" }],
         });
 
-        await Assert.ThrowsAsync<CatalystCliException>(
+        await Assert.ThrowsAsync<DiagridCliException>(
             () => Commands.CreateProjectAsync("demo", new(), default));
     }
 
@@ -97,12 +97,12 @@ public class ErrorSurfacingTests
         project.Identities.Add(new Aspire.Hosting.ApplicationModel.ContainerResource("a"), new(global::Diagrid.Aspire.Hosting.Model.IdentityKind.App, a));
         project.Identities.Add(new Aspire.Hosting.ApplicationModel.ContainerResource("b"), new(global::Diagrid.Aspire.Hosting.Model.IdentityKind.App, b));
 
-        await Assert.ThrowsAsync<CatalystCliException>(() => handler.ProvisionCatalystAsync(default));
+        await Assert.ThrowsAsync<DiagridCliException>(() => handler.ProvisionDiagridAsync(default));
 
         // The project endpoints were resolved before the failure, so only the identities are still pending.
         Assert.True(a.Task.IsFaulted, "a failed identity's TCS must be faulted, not left pending");
         Assert.True(b.Task.IsFaulted, "a not-yet-provisioned identity's TCS must be faulted, not left pending");
-        await Assert.ThrowsAsync<CatalystCliException>(() => b.Task);
+        await Assert.ThrowsAsync<DiagridCliException>(() => b.Task);
     }
 
     [Fact(Timeout = 30_000)]
@@ -119,7 +119,7 @@ public class ErrorSurfacingTests
         });
         var (project, handler, _) = HandlerHarness.Build();
 
-        await Assert.ThrowsAsync<CatalystCliException>(() => handler.ProvisionCatalystAsync(default));
+        await Assert.ThrowsAsync<DiagridCliException>(() => handler.ProvisionDiagridAsync(default));
 
         Assert.True(project.HttpEndpoint.Task.IsFaulted);
         Assert.True(project.GrpcEndpoint.Task.IsFaulted);

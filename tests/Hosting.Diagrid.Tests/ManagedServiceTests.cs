@@ -8,10 +8,10 @@ namespace Hosting.Diagrid.Tests;
 
 public class ManagedServiceTests
 {
-    private static CatalystProject Build(Func<IResourceBuilder<CatalystProject>, IResourceBuilder<CatalystProject>> configure)
+    private static DiagridProject Build(Func<IResourceBuilder<DiagridProject>, IResourceBuilder<DiagridProject>> configure)
     {
         var builder = DistributedApplication.CreateBuilder();
-        return configure(builder.AddCatalystProject("demo")).Resource;
+        return configure(builder.AddDiagridProject("demo")).Resource;
     }
 
     // The default is the Diagrid resource's own name. It is expected to be overridden, because the store has to
@@ -34,7 +34,7 @@ public class ManagedServiceTests
     [Fact]
     public void Kv_convenience_overload_registers_the_store_but_no_duplicate_component()
     {
-        var p = Build(b => b.WithCatalystKvStore());
+        var p = Build(b => b.WithDiagridKvStore());
 
         Assert.True(p.KvStores.ContainsKey("kvstore"));
         Assert.Empty(p.PubSubs);
@@ -44,7 +44,7 @@ public class ManagedServiceTests
     [Fact]
     public void Pubsub_convenience_overload_registers_the_broker_but_no_duplicate_component()
     {
-        var p = Build(b => b.WithCatalystPubSub());
+        var p = Build(b => b.WithDiagridPubSub());
 
         Assert.True(p.PubSubs.ContainsKey("pubsub"));
         Assert.Empty(p.KvStores);
@@ -56,7 +56,7 @@ public class ManagedServiceTests
     [Fact]
     public void Convenience_overloads_do_not_claim_the_actor_state_store_role()
     {
-        var p = Build(b => b.WithCatalystKvStore().WithCatalystPubSub());
+        var p = Build(b => b.WithDiagridKvStore().WithDiagridPubSub());
 
         Assert.True(p.KvStores.ContainsKey("kvstore"));
         Assert.True(p.PubSubs.ContainsKey("pubsub"));
@@ -66,7 +66,7 @@ public class ManagedServiceTests
     [Fact]
     public void Actor_state_store_is_still_available_explicitly()
     {
-        var p = Build(b => b.WithCatalystKvStore("statestore")
+        var p = Build(b => b.WithDiagridKvStore("statestore")
             .WithComponent("statestore", new DiagridStateStore
             {
                 Metadata = new() { State = "statestore", ActorStateStore = true },

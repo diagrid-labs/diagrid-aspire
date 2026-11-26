@@ -2,11 +2,11 @@ using System.Collections.Generic;
 
 namespace Diagrid.Aspire.Hosting;
 
-public interface ICatalystComponent
+public interface IDiagridComponent
 {
 }
 
-public interface ICatalystComponent<TMetadata> : ICatalystComponent
+public interface IDiagridComponent<TMetadata> : IDiagridComponent
 {
     public string Type { get; }
 

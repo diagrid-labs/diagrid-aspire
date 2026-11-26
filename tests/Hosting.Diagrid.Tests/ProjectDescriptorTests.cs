@@ -73,7 +73,7 @@ public class ProjectDescriptorTests
     [Fact]
     public void Provisioner_maps_every_descriptor_member_to_the_cli_options()
     {
-        var options = CliCatalystProvisioner.ToCreateOptions(new ProjectDescriptor
+        var options = CliDiagridProvisioner.ToCreateOptions(new ProjectDescriptor
         {
             EnableManagedWorkflow = true,
             Region = "aws-us-west",
@@ -89,7 +89,7 @@ public class ProjectDescriptorTests
              "--enable-workflow-history-signing=true", "--deploy-managed-pubsub=false", "--deploy-managed-kv=true",
              "--enable-managed-workflow", "--wait", "--disable-app-tunnels", "--ignore-if-exists"],
             Commands.BuildCreateProjectArgs("demo", options));
-        Assert.Equal("prod-us", CliCatalystProvisioner.ToCreateOptions(new ProjectDescriptor { RegionGroup = "prod-us" }).RegionGroup);
+        Assert.Equal("prod-us", CliDiagridProvisioner.ToCreateOptions(new ProjectDescriptor { RegionGroup = "prod-us" }).RegionGroup);
     }
 
     [Fact]

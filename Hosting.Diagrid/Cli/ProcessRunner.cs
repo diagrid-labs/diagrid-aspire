@@ -56,11 +56,11 @@ internal static class ProcessRunner
         try
         {
             process = Process.Start(startInfo)
-                ?? throw new CatalystCliException(arguments, -1, string.Empty, "Failed to start the diagrid process.");
+                ?? throw new DiagridCliException(arguments, -1, string.Empty, "Failed to start the diagrid process.");
         }
         catch (Win32Exception ex)
         {
-            throw new CatalystCliException(
+            throw new DiagridCliException(
                 arguments,
                 -1,
                 string.Empty,
@@ -101,7 +101,7 @@ internal static class ProcessRunner
                     throw;
                 }
 
-                throw new CatalystCliException(
+                throw new DiagridCliException(
                     arguments,
                     -1,
                     (await DrainAsync(stdOutPump, stdErrPump, grace)).StdErr,

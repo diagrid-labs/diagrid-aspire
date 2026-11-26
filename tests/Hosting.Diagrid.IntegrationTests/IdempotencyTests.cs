@@ -30,7 +30,7 @@ public class IdempotencyTests
 
     private static async Task ProvisionAsync(bool includeSubscription = true)
     {
-        var provisioner = new CliCatalystProvisioner();
+        var provisioner = new CliDiagridProvisioner();
         var ct = CancellationToken.None;
 
         await provisioner.CreateProjectAsync("demo", new(), ct);
@@ -129,8 +129,8 @@ public class IdempotencyTests
         using var fake = new FakeDiagridFixture();
         fake.SetScenario(new Scenario { Responses = [new() { ExitCode = 1, StdErr = "Error: boom" }] });
 
-        await Assert.ThrowsAsync<CatalystCliException>(
-            () => new CliCatalystProvisioner().CreateAppAsync("api", "demo", default));
+        await Assert.ThrowsAsync<DiagridCliException>(
+            () => new CliDiagridProvisioner().CreateAppAsync("api", "demo", default));
     }
 
     [Fact(Timeout = 30_000)]
@@ -139,8 +139,8 @@ public class IdempotencyTests
         using var fake = new FakeDiagridFixture();
         fake.SetScenario(new Scenario { Responses = [new() { ExitCode = 1, StdErr = "Error: boom" }] });
 
-        await Assert.ThrowsAsync<CatalystCliException>(
-            () => new CliCatalystProvisioner().UpsertSubscriptionAsync("demo",
+        await Assert.ThrowsAsync<DiagridCliException>(
+            () => new CliDiagridProvisioner().UpsertSubscriptionAsync("demo",
                 new() { Name = "sub", Component = "ps", Topic = "t", Route = "/r" }, default));
     }
 }

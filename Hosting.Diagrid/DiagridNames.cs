@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 
 namespace Diagrid.Aspire.Hosting;
 
-internal static partial class CatalystNames
+internal static partial class DiagridNames
 {
     private const int MaxLabelLength = 63;
     private const int HashLength = 8;

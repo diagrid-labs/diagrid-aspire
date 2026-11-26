@@ -6,7 +6,7 @@ using FakeDiagrid;
 namespace Hosting.Diagrid.IntegrationTests;
 
 // Every test builds a FakeDiagridFixture before spawning: a bare "diagrid" must never reach the real CLI.
-// These drive CatalystLifecycleHandler.ProvisionCatalystAsync over identities declared through the real fluent API,
+// These drive DiagridLifecycleHandler.ProvisionDiagridAsync over identities declared through the real fluent API,
 // so they pin that production dispatches on IdentityKind (not just that a helper works).
 [Collection(FakeDiagridCollection.Name)]
 public class AgentProvisioningTests
@@ -36,18 +36,18 @@ public class AgentProvisioningTests
     };
 
     /// <summary>Declares the resources through the public API on a real Aspire graph, then copies the identities onto the handler's project.</summary>
-    private static Action<CatalystProject> Declared(bool agent = true, bool app = false) => project =>
+    private static Action<DiagridProject> Declared(bool agent = true, bool app = false) => project =>
     {
         var builder = DistributedApplication.CreateBuilder();
-        var catalyst = builder.AddCatalystProject("demo");
+        var catalyst = builder.AddDiagridProject("demo");
         if (agent)
         {
-            builder.AddExecutable(AgentName, "dotnet", ".").WithCatalystAgent();
+            builder.AddExecutable(AgentName, "dotnet", ".").WithDiagridAgent();
         }
 
         if (app)
         {
-            builder.AddExecutable(AppName, "dotnet", ".").WithCatalystApp();
+            builder.AddExecutable(AppName, "dotnet", ".").WithDiagridApp();
         }
 
         foreach (var pair in catalyst.Resource.Identities)
@@ -56,7 +56,7 @@ public class AgentProvisioningTests
         }
     };
 
-    private static string TokenOf(CatalystProject project, string name)
+    private static string TokenOf(DiagridProject project, string name)
         => project.Identities.Single(i => i.Key.Name == name).Value.Details.Task.GetAwaiter().GetResult().ApiToken;
 
     // Mutation: the handler always calls CreateAppAsync -> 'agent create' is never seen and 'app create my-agent' is.
@@ -67,7 +67,7 @@ public class AgentProvisioningTests
         fake.SetScenario(Scenario(Fixture("agent-get.json")));
         var (_, handler, _, _) = HandlerHarness.BuildWithLogs(Declared(agent: true, app: true));
 
-        await handler.ProvisionCatalystAsync(default);
+        await handler.ProvisionDiagridAsync(default);
 
         var agentCreate = Assert.Single(fake.Invocations, i => i is ["agent", "create", ..]);
         Assert.Equal(AgentName, agentCreate[2]);
@@ -89,7 +89,7 @@ public class AgentProvisioningTests
         fake.SetScenario(Scenario(Fixture("agent-get.json")));
         var (project, handler, _, _) = HandlerHarness.BuildWithLogs(Declared(agent: true, app: true));
 
-        await handler.ProvisionCatalystAsync(default);
+        await handler.ProvisionDiagridAsync(default);
 
         Assert.DoesNotContain("\"apiToken\"", Fixture("agent-get.json").Split("\"appIds\"")[0], StringComparison.Ordinal);
         Assert.Equal(AgentToken, TokenOf(project, AgentName));
@@ -104,7 +104,7 @@ public class AgentProvisioningTests
         fake.SetScenario(Scenario(Fixture("agent-get-no-token.json")));
         var (_, handler, _, _) = HandlerHarness.BuildWithLogs(Declared());
 
-        var ex = await Assert.ThrowsAsync<InvalidOperationException>(() => handler.ProvisionCatalystAsync(default));
+        var ex = await Assert.ThrowsAsync<InvalidOperationException>(() => handler.ProvisionDiagridAsync(default));
 
         Assert.Contains(AgentName, ex.Message, StringComparison.Ordinal);
         Assert.Contains("Agent API may be unavailable", ex.Message, StringComparison.Ordinal);
@@ -119,7 +119,7 @@ public class AgentProvisioningTests
             new ScenarioResponse { ArgsMatch = "agent create", ExitCode = 1, StdErr = "Error: 404 page not found" }));
         var (_, handler, states, _) = HandlerHarness.BuildWithLogs(Declared());
 
-        var ex = await Assert.ThrowsAsync<CatalystCliException>(() => handler.ProvisionCatalystAsync(default));
+        var ex = await Assert.ThrowsAsync<DiagridCliException>(() => handler.ProvisionDiagridAsync(default));
 
         Assert.Contains(AgentName, ex.Message, StringComparison.Ordinal);
         Assert.Contains("404", ex.Message, StringComparison.Ordinal);
@@ -136,7 +136,7 @@ public class AgentProvisioningTests
         fake.SetScenario(Scenario(Fixture("agent-get.json")));
         var (_, handler, states, _) = HandlerHarness.BuildWithLogs(Declared());
 
-        await handler.ProvisionCatalystAsync(default);
+        await handler.ProvisionDiagridAsync(default);
         await states.Drain();
 
         Assert.Contains("Ensuring identities", states.Snapshot());

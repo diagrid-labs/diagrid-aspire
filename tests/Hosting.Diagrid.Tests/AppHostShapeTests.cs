@@ -11,10 +11,10 @@ namespace Hosting.Diagrid.Tests;
 // These tests build the distributed application model and never run it: no DCP, no process, no diagrid CLI.
 public class AppHostShapeTests
 {
-    private static (IDistributedApplicationBuilder Builder, IResourceBuilder<DotnetProjectResource> Api) Build(bool useCatalyst)
+    private static (IDistributedApplicationBuilder Builder, IResourceBuilder<DotnetProjectResource> Api) Build(bool useDiagrid)
     {
         var builder = DistributedApplication.CreateBuilder();
-        return (builder, DemoWiring.Configure(builder, useCatalyst, RepoFile("TestApi", "TestApi.csproj")));
+        return (builder, DemoWiring.Configure(builder, useDiagrid, RepoFile("TestApi", "TestApi.csproj")));
     }
 
     private static string RepoFile(params string[] parts)
@@ -47,35 +47,35 @@ public class AppHostShapeTests
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
-    public void AppHost_builds_under_both_switch_positions(bool useCatalyst)
+    public void AppHost_builds_under_both_switch_positions(bool useDiagrid)
     {
-        var (builder, api) = Build(useCatalyst);
+        var (builder, api) = Build(useDiagrid);
 
         Assert.Contains(builder.Resources, r => r.Name == "test-api");
-        Assert.Equal(useCatalyst, builder.Resources.Any(r => r is CatalystProject));
-        Assert.Equal(useCatalyst, !api.Resource.Annotations.OfType<DaprSidecarAnnotation>().Any());
+        Assert.Equal(useDiagrid, builder.Resources.Any(r => r is DiagridProject));
+        Assert.Equal(useDiagrid, !api.Resource.Annotations.OfType<DaprSidecarAnnotation>().Any());
     }
 
-    // Mutation: ignore USE_CATALYST in UseCatalystAsync() -> the true row sees no Diagrid project.
+    // Mutation: ignore USE_CATALYST in UseDiagridAsync() -> the true row sees no Diagrid project.
     [Theory]
     [InlineData("true", true)]
     [InlineData("false", false)]
-    public void The_USE_CATALYST_setting_selects_the_side(string value, bool expectCatalyst)
+    public void The_USE_CATALYST_setting_selects_the_side(string value, bool expectDiagrid)
     {
         var builder = DistributedApplication.CreateBuilder([$"USE_CATALYST={value}"]);
-        DemoWiring.Configure(builder, DemoWiring.UseCatalyst(builder), RepoFile("TestApi", "TestApi.csproj"));
+        DemoWiring.Configure(builder, DemoWiring.UseDiagrid(builder), RepoFile("TestApi", "TestApi.csproj"));
 
-        Assert.Equal(expectCatalyst, builder.Resources.Any(r => r is CatalystProject));
+        Assert.Equal(expectDiagrid, builder.Resources.Any(r => r is DiagridProject));
     }
 
     // The failure this whole effort exists to prevent: each side wired to a different component name. Compared
     // per kind (state vs pubsub), so a transposition cannot pass.
-    // Mutation: rename either YAML component, or give WithCatalystKvStore/WithCatalystPubSub another name.
+    // Mutation: rename either YAML component, or give WithDiagridKvStore/WithDiagridPubSub another name.
     [Fact]
     public void Both_sides_name_the_same_state_and_pubsub_components()
     {
         var (catalystBuilder, _) = Build(true);
-        var catalyst = catalystBuilder.Resources.OfType<CatalystProject>().Single();
+        var catalyst = catalystBuilder.Resources.OfType<DiagridProject>().Single();
         var (_, ossApi) = Build(false);
         var resources = OssSidecarResourcesDir(ossApi);
 
@@ -107,7 +107,7 @@ public class AppHostShapeTests
     {
         var source = File.ReadAllText(RepoFile("TestApi", "Program.cs"));
         var (catalystBuilder, _) = Build(true);
-        var subscription = Assert.Single(catalystBuilder.Resources.OfType<CatalystProject>().Single().Subscriptions).Value;
+        var subscription = Assert.Single(catalystBuilder.Resources.OfType<DiagridProject>().Single().Subscriptions).Value;
 
         Assert.Contains("const string StateStore = \"kvstore\";", source, StringComparison.Ordinal);
         Assert.Contains("const string PubSub = \"pubsub\";", source, StringComparison.Ordinal);
@@ -127,10 +127,13 @@ public class AppHostShapeTests
         Assert.Contains("GetStateAsync<Order?>(StateStore, ", source, StringComparison.Ordinal);
         Assert.Contains(".WithTopic(PubSub, Topic)", source, StringComparison.Ordinal);
 
-        // The pitch: service code is identical on both sides, so it never looks at the switch or at Diagrid.
-        // Mutation: add a USE_CATALYST / Configuration branch or a Diagrid reference to TestApi.
+        // The pitch: service code is identical on both sides, so it never looks at the switch or at the
+        // hosting integration. Mutation: add a USE_CATALYST / Configuration branch, or a
+        // Diagrid.Aspire.Hosting reference, to TestApi.
+        // Not "Diagrid" on its own: TestApi legitimately uses Diagrid.Aspire.Test.ServiceDefaults, so that
+        // assertion would fail for a reason that has nothing to do with the pitch.
         Assert.DoesNotContain("USE_CATALYST", source, StringComparison.Ordinal);
-        Assert.DoesNotContain("Catalyst", source, StringComparison.Ordinal);
+        Assert.DoesNotContain("Diagrid.Aspire.Hosting", source, StringComparison.Ordinal);
     }
 
     // Workflows are durable through the managed workflows-state component; a second flagged store would make
@@ -141,7 +144,7 @@ public class AppHostShapeTests
     public void Workflows_rely_on_the_managed_store_alone()
     {
         var (builder, _) = Build(true);
-        var catalyst = builder.Resources.OfType<CatalystProject>().Single();
+        var catalyst = builder.Resources.OfType<DiagridProject>().Single();
 
         Assert.True(catalyst.ProjectDescriptor.EnableManagedWorkflow);
         Assert.Empty(catalyst.Components);

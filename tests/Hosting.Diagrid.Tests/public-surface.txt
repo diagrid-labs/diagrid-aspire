@@ -1,27 +1,19 @@
-Diagrid.Aspire.Hosting.CatalystCliException..ctor(System.Collections.Generic.IReadOnlyList`1<System.String>, System.Int32, System.String, System.String, System.Exception) : void
-Diagrid.Aspire.Hosting.CatalystCliException.Arguments[] : System.Collections.Generic.IReadOnlyList`1<System.String> { get; }
-Diagrid.Aspire.Hosting.CatalystCliException.ExitCode[] : System.Int32 { get; }
-Diagrid.Aspire.Hosting.CatalystCliException.StdErr[] : System.String { get; }
-Diagrid.Aspire.Hosting.CatalystProject..ctor() : void
-Diagrid.Aspire.Hosting.CatalystProject.Annotations[] : Aspire.Hosting.ApplicationModel.ResourceAnnotationCollection { get; set; }
-Diagrid.Aspire.Hosting.CatalystProject.Name[] : System.String { get; }
-Diagrid.Aspire.Hosting.CatalystProject.ProjectName[] : System.String { get; set; }
-Diagrid.Aspire.Hosting.Cli.CliCatalystProvisioner..ctor() : void
-Diagrid.Aspire.Hosting.Cli.CliCatalystProvisioner.CreateAgentAsync(System.String, System.String, System.Threading.CancellationToken) : System.Threading.Tasks.Task
-Diagrid.Aspire.Hosting.Cli.CliCatalystProvisioner.CreateAppAsync(System.String, System.String, System.Threading.CancellationToken) : System.Threading.Tasks.Task
-Diagrid.Aspire.Hosting.Cli.CliCatalystProvisioner.CreateKvStoreAsync(System.String, Diagrid.Aspire.Hosting.Model.KvStoreDescriptor, System.Threading.CancellationToken) : System.Threading.Tasks.Task
-Diagrid.Aspire.Hosting.Cli.CliCatalystProvisioner.CreateProjectAsync(System.String, Diagrid.Aspire.Hosting.Model.ProjectDescriptor, System.Threading.CancellationToken) : System.Threading.Tasks.Task
-Diagrid.Aspire.Hosting.Cli.CliCatalystProvisioner.CreatePubSubAsync(System.String, Diagrid.Aspire.Hosting.Model.PubSubDescriptor, System.Threading.CancellationToken) : System.Threading.Tasks.Task
-Diagrid.Aspire.Hosting.Cli.CliCatalystProvisioner.GetAgentDetailsAsync(System.String, System.String, System.Threading.CancellationToken) : System.Threading.Tasks.Task`1<Diagrid.Aspire.Hosting.Model.AppDetails>
-Diagrid.Aspire.Hosting.Cli.CliCatalystProvisioner.GetAppDetailsAsync(System.String, System.String, System.Threading.CancellationToken) : System.Threading.Tasks.Task`1<Diagrid.Aspire.Hosting.Model.AppDetails>
-Diagrid.Aspire.Hosting.Cli.CliCatalystProvisioner.InitializeAsync(Microsoft.Extensions.Logging.ILogger, System.Threading.CancellationToken) : System.Threading.Tasks.Task
-Diagrid.Aspire.Hosting.Cli.CliCatalystProvisioner.KvStoreExistsAsync(System.String, System.String, System.Threading.CancellationToken) : System.Threading.Tasks.Task`1<System.Boolean>
-Diagrid.Aspire.Hosting.Cli.CliCatalystProvisioner.PubSubExistsAsync(System.String, System.String, System.Threading.CancellationToken) : System.Threading.Tasks.Task`1<System.Boolean>
-Diagrid.Aspire.Hosting.Cli.CliCatalystProvisioner.TryGetProjectDetailsAsync(System.String, System.Threading.CancellationToken) : System.Threading.Tasks.Task`1<Diagrid.Aspire.Hosting.Model.ProjectDetails>
-Diagrid.Aspire.Hosting.Cli.CliCatalystProvisioner.UpsertComponentAsync(Diagrid.Aspire.Hosting.Model.ComponentDescriptor, System.String, System.Boolean, System.Threading.CancellationToken) : System.Threading.Tasks.Task
-Diagrid.Aspire.Hosting.Cli.CliCatalystProvisioner.UpsertSubscriptionAsync(System.String, Diagrid.Aspire.Hosting.Model.SubscriptionDescriptor, System.Threading.CancellationToken) : System.Threading.Tasks.Task
-Diagrid.Aspire.Hosting.Cli.CliCatalystProvisioner.UseProjectAsync(System.String, System.Threading.CancellationToken) : System.Threading.Tasks.Task
-Diagrid.Aspire.Hosting.Cli.CliCatalystProvisioner.WaitForProjectReadyAsync(System.String, System.TimeSpan, System.Threading.CancellationToken) : System.Threading.Tasks.Task`1<Diagrid.Aspire.Hosting.Model.ProjectDetails>
+Diagrid.Aspire.Hosting.Cli.CliDiagridProvisioner..ctor() : void
+Diagrid.Aspire.Hosting.Cli.CliDiagridProvisioner.CreateAgentAsync(System.String, System.String, System.Threading.CancellationToken) : System.Threading.Tasks.Task
+Diagrid.Aspire.Hosting.Cli.CliDiagridProvisioner.CreateAppAsync(System.String, System.String, System.Threading.CancellationToken) : System.Threading.Tasks.Task
+Diagrid.Aspire.Hosting.Cli.CliDiagridProvisioner.CreateKvStoreAsync(System.String, Diagrid.Aspire.Hosting.Model.KvStoreDescriptor, System.Threading.CancellationToken) : System.Threading.Tasks.Task
+Diagrid.Aspire.Hosting.Cli.CliDiagridProvisioner.CreateProjectAsync(System.String, Diagrid.Aspire.Hosting.Model.ProjectDescriptor, System.Threading.CancellationToken) : System.Threading.Tasks.Task
+Diagrid.Aspire.Hosting.Cli.CliDiagridProvisioner.CreatePubSubAsync(System.String, Diagrid.Aspire.Hosting.Model.PubSubDescriptor, System.Threading.CancellationToken) : System.Threading.Tasks.Task
+Diagrid.Aspire.Hosting.Cli.CliDiagridProvisioner.GetAgentDetailsAsync(System.String, System.String, System.Threading.CancellationToken) : System.Threading.Tasks.Task`1<Diagrid.Aspire.Hosting.Model.AppDetails>
+Diagrid.Aspire.Hosting.Cli.CliDiagridProvisioner.GetAppDetailsAsync(System.String, System.String, System.Threading.CancellationToken) : System.Threading.Tasks.Task`1<Diagrid.Aspire.Hosting.Model.AppDetails>
+Diagrid.Aspire.Hosting.Cli.CliDiagridProvisioner.InitializeAsync(Microsoft.Extensions.Logging.ILogger, System.Threading.CancellationToken) : System.Threading.Tasks.Task
+Diagrid.Aspire.Hosting.Cli.CliDiagridProvisioner.KvStoreExistsAsync(System.String, System.String, System.Threading.CancellationToken) : System.Threading.Tasks.Task`1<System.Boolean>
+Diagrid.Aspire.Hosting.Cli.CliDiagridProvisioner.PubSubExistsAsync(System.String, System.String, System.Threading.CancellationToken) : System.Threading.Tasks.Task`1<System.Boolean>
+Diagrid.Aspire.Hosting.Cli.CliDiagridProvisioner.TryGetProjectDetailsAsync(System.String, System.Threading.CancellationToken) : System.Threading.Tasks.Task`1<Diagrid.Aspire.Hosting.Model.ProjectDetails>
+Diagrid.Aspire.Hosting.Cli.CliDiagridProvisioner.UpsertComponentAsync(Diagrid.Aspire.Hosting.Model.ComponentDescriptor, System.String, System.Boolean, System.Threading.CancellationToken) : System.Threading.Tasks.Task
+Diagrid.Aspire.Hosting.Cli.CliDiagridProvisioner.UpsertSubscriptionAsync(System.String, Diagrid.Aspire.Hosting.Model.SubscriptionDescriptor, System.Threading.CancellationToken) : System.Threading.Tasks.Task
+Diagrid.Aspire.Hosting.Cli.CliDiagridProvisioner.UseProjectAsync(System.String, System.Threading.CancellationToken) : System.Threading.Tasks.Task
+Diagrid.Aspire.Hosting.Cli.CliDiagridProvisioner.WaitForProjectReadyAsync(System.String, System.TimeSpan, System.Threading.CancellationToken) : System.Threading.Tasks.Task`1<Diagrid.Aspire.Hosting.Model.ProjectDetails>
 Diagrid.Aspire.Hosting.Cli.Options.CreateComponentOptions..ctor() : void
 Diagrid.Aspire.Hosting.Cli.Options.CreateComponentOptions.IgnoreIfExists[] : System.Boolean { get; set; }
 Diagrid.Aspire.Hosting.Cli.Options.CreateComponentOptions.Project[] : System.String { get; set; }
@@ -136,24 +128,32 @@ Diagrid.Aspire.Hosting.ComponentSpec.DiagridStateStore..ctor() : void
 Diagrid.Aspire.Hosting.ComponentSpec.DiagridStateStore.Metadata[] : Diagrid.Aspire.Hosting.ComponentSpec.DiagridStateSpecMetadata { get; set; }
 Diagrid.Aspire.Hosting.ComponentSpec.DiagridStateStore.Scopes[] : System.Collections.Generic.IList`1<System.String> { get; set; }
 Diagrid.Aspire.Hosting.ComponentSpec.DiagridStateStore.Type[] : System.String { get; }
-Diagrid.Aspire.Hosting.ICatalystComponent`1.Metadata[] : TMetadata { get; }
-Diagrid.Aspire.Hosting.ICatalystComponent`1.Scopes[] : System.Collections.Generic.IList`1<System.String> { get; }
-Diagrid.Aspire.Hosting.ICatalystComponent`1.Type[] : System.String { get; }
-Diagrid.Aspire.Hosting.ICatalystProvisioner.CreateAgentAsync(System.String, System.String, System.Threading.CancellationToken) : System.Threading.Tasks.Task
-Diagrid.Aspire.Hosting.ICatalystProvisioner.CreateAppAsync(System.String, System.String, System.Threading.CancellationToken) : System.Threading.Tasks.Task
-Diagrid.Aspire.Hosting.ICatalystProvisioner.CreateKvStoreAsync(System.String, Diagrid.Aspire.Hosting.Model.KvStoreDescriptor, System.Threading.CancellationToken) : System.Threading.Tasks.Task
-Diagrid.Aspire.Hosting.ICatalystProvisioner.CreateProjectAsync(System.String, Diagrid.Aspire.Hosting.Model.ProjectDescriptor, System.Threading.CancellationToken) : System.Threading.Tasks.Task
-Diagrid.Aspire.Hosting.ICatalystProvisioner.CreatePubSubAsync(System.String, Diagrid.Aspire.Hosting.Model.PubSubDescriptor, System.Threading.CancellationToken) : System.Threading.Tasks.Task
-Diagrid.Aspire.Hosting.ICatalystProvisioner.GetAgentDetailsAsync(System.String, System.String, System.Threading.CancellationToken) : System.Threading.Tasks.Task`1<Diagrid.Aspire.Hosting.Model.AppDetails>
-Diagrid.Aspire.Hosting.ICatalystProvisioner.GetAppDetailsAsync(System.String, System.String, System.Threading.CancellationToken) : System.Threading.Tasks.Task`1<Diagrid.Aspire.Hosting.Model.AppDetails>
-Diagrid.Aspire.Hosting.ICatalystProvisioner.InitializeAsync(Microsoft.Extensions.Logging.ILogger, System.Threading.CancellationToken) : System.Threading.Tasks.Task
-Diagrid.Aspire.Hosting.ICatalystProvisioner.KvStoreExistsAsync(System.String, System.String, System.Threading.CancellationToken) : System.Threading.Tasks.Task`1<System.Boolean>
-Diagrid.Aspire.Hosting.ICatalystProvisioner.PubSubExistsAsync(System.String, System.String, System.Threading.CancellationToken) : System.Threading.Tasks.Task`1<System.Boolean>
-Diagrid.Aspire.Hosting.ICatalystProvisioner.TryGetProjectDetailsAsync(System.String, System.Threading.CancellationToken) : System.Threading.Tasks.Task`1<Diagrid.Aspire.Hosting.Model.ProjectDetails>
-Diagrid.Aspire.Hosting.ICatalystProvisioner.UpsertComponentAsync(Diagrid.Aspire.Hosting.Model.ComponentDescriptor, System.String, System.Boolean, System.Threading.CancellationToken) : System.Threading.Tasks.Task
-Diagrid.Aspire.Hosting.ICatalystProvisioner.UpsertSubscriptionAsync(System.String, Diagrid.Aspire.Hosting.Model.SubscriptionDescriptor, System.Threading.CancellationToken) : System.Threading.Tasks.Task
-Diagrid.Aspire.Hosting.ICatalystProvisioner.UseProjectAsync(System.String, System.Threading.CancellationToken) : System.Threading.Tasks.Task
-Diagrid.Aspire.Hosting.ICatalystProvisioner.WaitForProjectReadyAsync(System.String, System.TimeSpan, System.Threading.CancellationToken) : System.Threading.Tasks.Task`1<Diagrid.Aspire.Hosting.Model.ProjectDetails>
+Diagrid.Aspire.Hosting.DiagridCliException..ctor(System.Collections.Generic.IReadOnlyList`1<System.String>, System.Int32, System.String, System.String, System.Exception) : void
+Diagrid.Aspire.Hosting.DiagridCliException.Arguments[] : System.Collections.Generic.IReadOnlyList`1<System.String> { get; }
+Diagrid.Aspire.Hosting.DiagridCliException.ExitCode[] : System.Int32 { get; }
+Diagrid.Aspire.Hosting.DiagridCliException.StdErr[] : System.String { get; }
+Diagrid.Aspire.Hosting.DiagridProject..ctor() : void
+Diagrid.Aspire.Hosting.DiagridProject.Annotations[] : Aspire.Hosting.ApplicationModel.ResourceAnnotationCollection { get; set; }
+Diagrid.Aspire.Hosting.DiagridProject.Name[] : System.String { get; }
+Diagrid.Aspire.Hosting.DiagridProject.ProjectName[] : System.String { get; set; }
+Diagrid.Aspire.Hosting.IDiagridComponent`1.Metadata[] : TMetadata { get; }
+Diagrid.Aspire.Hosting.IDiagridComponent`1.Scopes[] : System.Collections.Generic.IList`1<System.String> { get; }
+Diagrid.Aspire.Hosting.IDiagridComponent`1.Type[] : System.String { get; }
+Diagrid.Aspire.Hosting.IDiagridProvisioner.CreateAgentAsync(System.String, System.String, System.Threading.CancellationToken) : System.Threading.Tasks.Task
+Diagrid.Aspire.Hosting.IDiagridProvisioner.CreateAppAsync(System.String, System.String, System.Threading.CancellationToken) : System.Threading.Tasks.Task
+Diagrid.Aspire.Hosting.IDiagridProvisioner.CreateKvStoreAsync(System.String, Diagrid.Aspire.Hosting.Model.KvStoreDescriptor, System.Threading.CancellationToken) : System.Threading.Tasks.Task
+Diagrid.Aspire.Hosting.IDiagridProvisioner.CreateProjectAsync(System.String, Diagrid.Aspire.Hosting.Model.ProjectDescriptor, System.Threading.CancellationToken) : System.Threading.Tasks.Task
+Diagrid.Aspire.Hosting.IDiagridProvisioner.CreatePubSubAsync(System.String, Diagrid.Aspire.Hosting.Model.PubSubDescriptor, System.Threading.CancellationToken) : System.Threading.Tasks.Task
+Diagrid.Aspire.Hosting.IDiagridProvisioner.GetAgentDetailsAsync(System.String, System.String, System.Threading.CancellationToken) : System.Threading.Tasks.Task`1<Diagrid.Aspire.Hosting.Model.AppDetails>
+Diagrid.Aspire.Hosting.IDiagridProvisioner.GetAppDetailsAsync(System.String, System.String, System.Threading.CancellationToken) : System.Threading.Tasks.Task`1<Diagrid.Aspire.Hosting.Model.AppDetails>
+Diagrid.Aspire.Hosting.IDiagridProvisioner.InitializeAsync(Microsoft.Extensions.Logging.ILogger, System.Threading.CancellationToken) : System.Threading.Tasks.Task
+Diagrid.Aspire.Hosting.IDiagridProvisioner.KvStoreExistsAsync(System.String, System.String, System.Threading.CancellationToken) : System.Threading.Tasks.Task`1<System.Boolean>
+Diagrid.Aspire.Hosting.IDiagridProvisioner.PubSubExistsAsync(System.String, System.String, System.Threading.CancellationToken) : System.Threading.Tasks.Task`1<System.Boolean>
+Diagrid.Aspire.Hosting.IDiagridProvisioner.TryGetProjectDetailsAsync(System.String, System.Threading.CancellationToken) : System.Threading.Tasks.Task`1<Diagrid.Aspire.Hosting.Model.ProjectDetails>
+Diagrid.Aspire.Hosting.IDiagridProvisioner.UpsertComponentAsync(Diagrid.Aspire.Hosting.Model.ComponentDescriptor, System.String, System.Boolean, System.Threading.CancellationToken) : System.Threading.Tasks.Task
+Diagrid.Aspire.Hosting.IDiagridProvisioner.UpsertSubscriptionAsync(System.String, Diagrid.Aspire.Hosting.Model.SubscriptionDescriptor, System.Threading.CancellationToken) : System.Threading.Tasks.Task
+Diagrid.Aspire.Hosting.IDiagridProvisioner.UseProjectAsync(System.String, System.Threading.CancellationToken) : System.Threading.Tasks.Task
+Diagrid.Aspire.Hosting.IDiagridProvisioner.WaitForProjectReadyAsync(System.String, System.TimeSpan, System.Threading.CancellationToken) : System.Threading.Tasks.Task`1<Diagrid.Aspire.Hosting.Model.ProjectDetails>
 Diagrid.Aspire.Hosting.Model.AppDetails..ctor() : void
 Diagrid.Aspire.Hosting.Model.AppDetails.ApiToken[] : System.String { get; set; }
 Diagrid.Aspire.Hosting.Model.ComponentDescriptor..ctor() : void
@@ -191,25 +191,23 @@ Diagrid.Aspire.Hosting.Model.SubscriptionDescriptor.Name[] : System.String { get
 Diagrid.Aspire.Hosting.Model.SubscriptionDescriptor.Route[] : System.String { get; set; }
 Diagrid.Aspire.Hosting.Model.SubscriptionDescriptor.Scopes[] : System.Collections.Generic.IList`1<System.String> { get; set; }
 Diagrid.Aspire.Hosting.Model.SubscriptionDescriptor.Topic[] : System.String { get; set; }
-Diagrid.Aspire.Hosting.ResourceBuilderExtensions.AddCatalystProject(Aspire.Hosting.IDistributedApplicationBuilder, System.String, Diagrid.Aspire.Hosting.Model.ProjectDescriptor) : Aspire.Hosting.ApplicationModel.IResourceBuilder`1<Diagrid.Aspire.Hosting.CatalystProject>
+Diagrid.Aspire.Hosting.ResourceBuilderExtensions.AddDiagridProject(Aspire.Hosting.IDistributedApplicationBuilder, System.String, Diagrid.Aspire.Hosting.Model.ProjectDescriptor) : Aspire.Hosting.ApplicationModel.IResourceBuilder`1<Diagrid.Aspire.Hosting.DiagridProject>
 Diagrid.Aspire.Hosting.ResourceBuilderExtensions.SampleKvName : System.String
 Diagrid.Aspire.Hosting.ResourceBuilderExtensions.SamplePubsubName : System.String
-Diagrid.Aspire.Hosting.ResourceBuilderExtensions.WithCatalyst(Aspire.Hosting.ApplicationModel.IResourceBuilder`1<TResource>, Aspire.Hosting.ApplicationModel.IResourceBuilder`1<Diagrid.Aspire.Hosting.CatalystProject>) : Aspire.Hosting.ApplicationModel.IResourceBuilder`1<TResource>
-Diagrid.Aspire.Hosting.ResourceBuilderExtensions.WithCatalystAgent(Aspire.Hosting.ApplicationModel.IResourceBuilder`1<TResource>, Aspire.Hosting.ApplicationModel.IResourceBuilder`1<Diagrid.Aspire.Hosting.CatalystProject>) : Aspire.Hosting.ApplicationModel.IResourceBuilder`1<TResource>
-Diagrid.Aspire.Hosting.ResourceBuilderExtensions.WithCatalystApp(Aspire.Hosting.ApplicationModel.IResourceBuilder`1<TResource>, Aspire.Hosting.ApplicationModel.IResourceBuilder`1<Diagrid.Aspire.Hosting.CatalystProject>) : Aspire.Hosting.ApplicationModel.IResourceBuilder`1<TResource>
-Diagrid.Aspire.Hosting.ResourceBuilderExtensions.WithCatalystKvStore(Aspire.Hosting.ApplicationModel.IResourceBuilder`1<Diagrid.Aspire.Hosting.CatalystProject>) : Aspire.Hosting.ApplicationModel.IResourceBuilder`1<Diagrid.Aspire.Hosting.CatalystProject>
-Diagrid.Aspire.Hosting.ResourceBuilderExtensions.WithCatalystKvStore(Aspire.Hosting.ApplicationModel.IResourceBuilder`1<Diagrid.Aspire.Hosting.CatalystProject>, System.String, System.Collections.Generic.IList`1<System.String>) : Aspire.Hosting.ApplicationModel.IResourceBuilder`1<Diagrid.Aspire.Hosting.CatalystProject>
-Diagrid.Aspire.Hosting.ResourceBuilderExtensions.WithCatalystPubSub(Aspire.Hosting.ApplicationModel.IResourceBuilder`1<Diagrid.Aspire.Hosting.CatalystProject>) : Aspire.Hosting.ApplicationModel.IResourceBuilder`1<Diagrid.Aspire.Hosting.CatalystProject>
-Diagrid.Aspire.Hosting.ResourceBuilderExtensions.WithCatalystPubSub(Aspire.Hosting.ApplicationModel.IResourceBuilder`1<Diagrid.Aspire.Hosting.CatalystProject>, System.String, System.Collections.Generic.IList`1<System.String>) : Aspire.Hosting.ApplicationModel.IResourceBuilder`1<Diagrid.Aspire.Hosting.CatalystProject>
-Diagrid.Aspire.Hosting.ResourceBuilderExtensions.WithComponent(Aspire.Hosting.ApplicationModel.IResourceBuilder`1<Diagrid.Aspire.Hosting.CatalystProject>, System.String, Diagrid.Aspire.Hosting.ICatalystComponent`1<TMetadata>) : Aspire.Hosting.ApplicationModel.IResourceBuilder`1<Diagrid.Aspire.Hosting.CatalystProject>
-Diagrid.Aspire.Hosting.ResourceBuilderExtensions.WithComponent(Aspire.Hosting.ApplicationModel.IResourceBuilder`1<Diagrid.Aspire.Hosting.CatalystProject>, System.String, System.String, System.Collections.Generic.IDictionary`2<System.String, System.Object>, System.Collections.Generic.IList`1<System.String>) : Aspire.Hosting.ApplicationModel.IResourceBuilder`1<Diagrid.Aspire.Hosting.CatalystProject>
+Diagrid.Aspire.Hosting.ResourceBuilderExtensions.WithComponent(Aspire.Hosting.ApplicationModel.IResourceBuilder`1<Diagrid.Aspire.Hosting.DiagridProject>, System.String, Diagrid.Aspire.Hosting.IDiagridComponent`1<TMetadata>) : Aspire.Hosting.ApplicationModel.IResourceBuilder`1<Diagrid.Aspire.Hosting.DiagridProject>
+Diagrid.Aspire.Hosting.ResourceBuilderExtensions.WithComponent(Aspire.Hosting.ApplicationModel.IResourceBuilder`1<Diagrid.Aspire.Hosting.DiagridProject>, System.String, System.String, System.Collections.Generic.IDictionary`2<System.String, System.Object>, System.Collections.Generic.IList`1<System.String>) : Aspire.Hosting.ApplicationModel.IResourceBuilder`1<Diagrid.Aspire.Hosting.DiagridProject>
+Diagrid.Aspire.Hosting.ResourceBuilderExtensions.WithDiagrid(Aspire.Hosting.ApplicationModel.IResourceBuilder`1<TResource>, Aspire.Hosting.ApplicationModel.IResourceBuilder`1<Diagrid.Aspire.Hosting.DiagridProject>) : Aspire.Hosting.ApplicationModel.IResourceBuilder`1<TResource>
+Diagrid.Aspire.Hosting.ResourceBuilderExtensions.WithDiagridAgent(Aspire.Hosting.ApplicationModel.IResourceBuilder`1<TResource>, Aspire.Hosting.ApplicationModel.IResourceBuilder`1<Diagrid.Aspire.Hosting.DiagridProject>) : Aspire.Hosting.ApplicationModel.IResourceBuilder`1<TResource>
+Diagrid.Aspire.Hosting.ResourceBuilderExtensions.WithDiagridApp(Aspire.Hosting.ApplicationModel.IResourceBuilder`1<TResource>, Aspire.Hosting.ApplicationModel.IResourceBuilder`1<Diagrid.Aspire.Hosting.DiagridProject>) : Aspire.Hosting.ApplicationModel.IResourceBuilder`1<TResource>
+Diagrid.Aspire.Hosting.ResourceBuilderExtensions.WithDiagridKvStore(Aspire.Hosting.ApplicationModel.IResourceBuilder`1<Diagrid.Aspire.Hosting.DiagridProject>) : Aspire.Hosting.ApplicationModel.IResourceBuilder`1<Diagrid.Aspire.Hosting.DiagridProject>
+Diagrid.Aspire.Hosting.ResourceBuilderExtensions.WithDiagridKvStore(Aspire.Hosting.ApplicationModel.IResourceBuilder`1<Diagrid.Aspire.Hosting.DiagridProject>, System.String, System.Collections.Generic.IList`1<System.String>) : Aspire.Hosting.ApplicationModel.IResourceBuilder`1<Diagrid.Aspire.Hosting.DiagridProject>
+Diagrid.Aspire.Hosting.ResourceBuilderExtensions.WithDiagridPubSub(Aspire.Hosting.ApplicationModel.IResourceBuilder`1<Diagrid.Aspire.Hosting.DiagridProject>) : Aspire.Hosting.ApplicationModel.IResourceBuilder`1<Diagrid.Aspire.Hosting.DiagridProject>
+Diagrid.Aspire.Hosting.ResourceBuilderExtensions.WithDiagridPubSub(Aspire.Hosting.ApplicationModel.IResourceBuilder`1<Diagrid.Aspire.Hosting.DiagridProject>, System.String, System.Collections.Generic.IList`1<System.String>) : Aspire.Hosting.ApplicationModel.IResourceBuilder`1<Diagrid.Aspire.Hosting.DiagridProject>
 Diagrid.Aspire.Hosting.ResourceBuilderExtensions.WithSubscription(Aspire.Hosting.ApplicationModel.IResourceBuilder`1<TResource>, System.String, System.String) : Aspire.Hosting.ApplicationModel.IResourceBuilder`1<TResource>
 Diagrid.Aspire.Hosting.ResourceBuilderExtensions.WithSubscription(Aspire.Hosting.ApplicationModel.IResourceBuilder`1<TResource>, System.String, System.String, System.String, System.String) : Aspire.Hosting.ApplicationModel.IResourceBuilder`1<TResource>
 Diagrid.Aspire.Hosting.ResourceBuilderExtensions.WithSubscription(Aspire.Hosting.ApplicationModel.IResourceBuilder`1<TResource>, System.String, System.String, System.String, System.String, System.Boolean, System.Nullable`1<System.Int32>, System.Nullable`1<System.TimeSpan>) : Aspire.Hosting.ApplicationModel.IResourceBuilder`1<TResource>
 Projects.Hosting_Diagrid.ProjectPath[] : System.String { get; }
-type Diagrid.Aspire.Hosting.CatalystCliException
-type Diagrid.Aspire.Hosting.CatalystProject
-type Diagrid.Aspire.Hosting.Cli.CliCatalystProvisioner
+type Diagrid.Aspire.Hosting.Cli.CliDiagridProvisioner
 type Diagrid.Aspire.Hosting.Cli.Options.CreateComponentOptions
 type Diagrid.Aspire.Hosting.Cli.Options.CreateIdentityOptions
 type Diagrid.Aspire.Hosting.Cli.Options.CreateKvStoreOptions
@@ -230,9 +228,11 @@ type Diagrid.Aspire.Hosting.ComponentSpec.DiagridPubSub
 type Diagrid.Aspire.Hosting.ComponentSpec.DiagridPubSubSpecMetadata
 type Diagrid.Aspire.Hosting.ComponentSpec.DiagridStateSpecMetadata
 type Diagrid.Aspire.Hosting.ComponentSpec.DiagridStateStore
-type Diagrid.Aspire.Hosting.ICatalystComponent
-type Diagrid.Aspire.Hosting.ICatalystComponent`1
-type Diagrid.Aspire.Hosting.ICatalystProvisioner
+type Diagrid.Aspire.Hosting.DiagridCliException
+type Diagrid.Aspire.Hosting.DiagridProject
+type Diagrid.Aspire.Hosting.IDiagridComponent
+type Diagrid.Aspire.Hosting.IDiagridComponent`1
+type Diagrid.Aspire.Hosting.IDiagridProvisioner
 type Diagrid.Aspire.Hosting.Model.AppDetails
 type Diagrid.Aspire.Hosting.Model.ComponentDescriptor
 type Diagrid.Aspire.Hosting.Model.IdentityKind

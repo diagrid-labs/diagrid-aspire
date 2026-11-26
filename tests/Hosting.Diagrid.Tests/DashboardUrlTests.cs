@@ -26,7 +26,7 @@ public class DashboardUrlTests
     public void Project_resource_carries_the_derived_dashboard_link()
     {
         var builder = DistributedApplication.CreateBuilder();
-        var project = builder.AddCatalystProject("demo");
+        var project = builder.AddDiagridProject("demo");
 
         var url = Assert.Single(project.Resource.Annotations.OfType<ResourceUrlAnnotation>());
         Assert.Equal("Diagrid Console", url.DisplayText);
@@ -43,7 +43,7 @@ public class DashboardUrlTests
         try
         {
             var builder = DistributedApplication.CreateBuilder();
-            var project = builder.AddCatalystProject("demo");
+            var project = builder.AddDiagridProject("demo");
 
             var url = Assert.Single(project.Resource.Annotations.OfType<ResourceUrlAnnotation>());
             Assert.Equal("https://catalyst.stg.diagrid.io/admin/organization", url.Url);
@@ -82,15 +82,15 @@ public class ProjectNameAndWorkingDirectoryTests
     {
         var ex = Assert.Throws<ArgumentException>(() => Ext.ResolveProjectName(null, null));
         Assert.Contains("top-level statements", ex.Message, StringComparison.Ordinal);
-        Assert.Contains("AddCatalystProject(\"my-project\")", ex.Message, StringComparison.Ordinal);
+        Assert.Contains("AddDiagridProject(\"my-project\")", ex.Message, StringComparison.Ordinal);
     }
 
     [Fact]
     public void The_dev_run_proxy_runs_in_the_apphost_directory()
     {
         var builder = DistributedApplication.CreateBuilder();
-        builder.AddCatalystProject("demo");
-        builder.AddExecutable("worker", "dotnet", ".").WithCatalystApp();
+        builder.AddDiagridProject("demo");
+        builder.AddExecutable("worker", "dotnet", ".").WithDiagridApp();
 
         var proxy = builder.Resources.OfType<ExecutableResource>().Single(r => r.Name == "worker-catalyst-proxy");
 

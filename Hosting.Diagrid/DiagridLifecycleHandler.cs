@@ -9,11 +9,11 @@ using Microsoft.Extensions.Logging;
 
 namespace Diagrid.Aspire.Hosting;
 
-internal sealed class CatalystLifecycleHandler(
-    CatalystProject catalystProject,
+internal sealed class DiagridLifecycleHandler(
+    DiagridProject catalystProject,
     ResourceLoggerService resourceLogger,
     ResourceNotificationService notifications,
-    ICatalystProvisioner provisioner
+    IDiagridProvisioner provisioner
 )
 {
     /// <summary>The component type that fronts a Diagrid-managed KV store, and the metadata key naming the store.</summary>
@@ -30,7 +30,7 @@ internal sealed class CatalystLifecycleHandler(
 
     private readonly ILogger _logger = resourceLogger.GetLogger(catalystProject);
 
-    public async Task ProvisionCatalystAsync(CancellationToken cancellationToken)
+    public async Task ProvisionDiagridAsync(CancellationToken cancellationToken)
     {
         LogWelcomeMessage();
 

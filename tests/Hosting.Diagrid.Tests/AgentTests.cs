@@ -7,25 +7,25 @@ namespace Hosting.Diagrid.Tests;
 
 public class AgentTests
 {
-    // Mutation: WithCatalystAgent passes IdentityKind.App -> fails.
+    // Mutation: WithDiagridAgent passes IdentityKind.App -> fails.
     [Fact]
     public void Registers_the_resource_as_an_agent_identity()
     {
-        var project = Build(b => b.AddExecutable("my-agent", "dotnet", ".").WithCatalystAgent());
+        var project = Build(b => b.AddExecutable("my-agent", "dotnet", ".").WithDiagridAgent());
 
         var identity = Assert.Single(project.Identities);
         Assert.Equal("my-agent", identity.Key.Name);
         Assert.Equal(IdentityKind.Agent, identity.Value.Kind);
     }
 
-    // Mutation: WithCatalystApp passes IdentityKind.Agent (or both share a hard-coded kind) -> the app assertion fails.
+    // Mutation: WithDiagridApp passes IdentityKind.Agent (or both share a hard-coded kind) -> the app assertion fails.
     [Fact]
     public void An_app_and_an_agent_in_one_project_keep_their_own_kinds()
     {
         var project = Build(b =>
         {
-            b.AddExecutable("my-agent", "dotnet", ".").WithCatalystAgent();
-            b.AddExecutable("my-app", "dotnet", ".").WithCatalystApp();
+            b.AddExecutable("my-agent", "dotnet", ".").WithDiagridAgent();
+            b.AddExecutable("my-app", "dotnet", ".").WithDiagridApp();
         });
 
         Assert.Equal(IdentityKind.Agent, project.Identities.Single(i => i.Key.Name == "my-agent").Value.Kind);
@@ -37,8 +37,8 @@ public class AgentTests
     [Fact]
     public void An_agent_gets_the_same_dev_run_proxy_as_an_app()
     {
-        var agent = Build(b => b.AddContainer("same-name", "img").WithHttpEndpoint(targetPort: 8080).WithCatalystAgent());
-        var app = Build(b => b.AddContainer("same-name", "img").WithHttpEndpoint(targetPort: 8080).WithCatalystApp());
+        var agent = Build(b => b.AddContainer("same-name", "img").WithHttpEndpoint(targetPort: 8080).WithDiagridAgent());
+        var app = Build(b => b.AddContainer("same-name", "img").WithHttpEndpoint(targetPort: 8080).WithDiagridApp());
 
         var agentArgs = ProxyArgs(agent);
         Assert.Equal(ProxyArgs(app), agentArgs);
@@ -50,34 +50,34 @@ public class AgentTests
     public void Rejects_an_invalid_resource_name_for_an_agent()
     {
         var builder = DistributedApplication.CreateBuilder();
-        builder.AddCatalystProject("demo");
+        builder.AddDiagridProject("demo");
         var bad = builder.AddExecutable("MyAgent", "dotnet", ".");
 
-        var ex = Assert.Throws<ArgumentException>(() => bad.WithCatalystAgent());
+        var ex = Assert.Throws<ArgumentException>(() => bad.WithDiagridAgent());
         Assert.Contains("MyAgent", ex.Message, StringComparison.Ordinal);
     }
 
     // The multiple-projects error names the public method the developer called.
     [Fact]
-    public void The_multiple_projects_error_names_WithCatalystAgent()
+    public void The_multiple_projects_error_names_WithDiagridAgent()
     {
         var builder = DistributedApplication.CreateBuilder();
-        builder.AddCatalystProject("one");
-        builder.AddCatalystProject("two");
+        builder.AddDiagridProject("one");
+        builder.AddDiagridProject("two");
 
-        var ex = Assert.Throws<InvalidOperationException>(() => builder.AddExecutable("my-agent", "dotnet", ".").WithCatalystAgent());
-        Assert.Contains("WithCatalystAgent", ex.Message, StringComparison.Ordinal);
+        var ex = Assert.Throws<InvalidOperationException>(() => builder.AddExecutable("my-agent", "dotnet", ".").WithDiagridAgent());
+        Assert.Contains("WithDiagridAgent", ex.Message, StringComparison.Ordinal);
     }
 
-    private static CatalystProject Build(Action<IDistributedApplicationBuilder> configure)
+    private static DiagridProject Build(Action<IDistributedApplicationBuilder> configure)
     {
         var builder = DistributedApplication.CreateBuilder();
-        var catalyst = builder.AddCatalystProject("demo");
+        var catalyst = builder.AddDiagridProject("demo");
         configure(builder);
         return catalyst.Resource;
     }
 
-    private static List<string> ProxyArgs(CatalystProject project)
+    private static List<string> ProxyArgs(DiagridProject project)
     {
         var owner = project.Identities.Keys.Single();
         var proxy = owner.Annotations.OfType<ResourceRelationshipAnnotation>()

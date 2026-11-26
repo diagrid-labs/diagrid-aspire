@@ -4,9 +4,9 @@ using System.Collections.Generic;
 namespace Diagrid.Aspire.Hosting;
 
 /// <summary>Raised when the <c>diagrid</c> CLI fails, times out, or cannot be run.</summary>
-public sealed class CatalystCliException : Exception
+public sealed class DiagridCliException : Exception
 {
-    public CatalystCliException(
+    public DiagridCliException(
         IReadOnlyList<string> arguments,
         int exitCode,
         string stdErr,

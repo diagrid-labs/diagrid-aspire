@@ -30,7 +30,7 @@ public class PreflightTests
 
     private static ScenarioResponse AnythingElseSucceeds() => new() { ExitCode = 0 };
 
-    private static Scenario Healthy(string version = CatalystCli.MinimumVersion)
+    private static Scenario Healthy(string version = DiagridCli.MinimumVersion)
         => new() { Responses = [Version(version), Whoami(), AnythingElseSucceeds()] };
 
     // --- the version reader, on its own ---
@@ -43,7 +43,7 @@ public class PreflightTests
     [InlineData("2.0.0")]
     public void Versions_at_or_above_the_floor_pass(string version)
         // True, not merely "did not throw": an unreadable version also does not throw, but returns false.
-        => Assert.True(CatalystCli.EnsureSupportedVersion(["version"], VersionOutput(version)));
+        => Assert.True(DiagridCli.EnsureSupportedVersion(["version"], VersionOutput(version)));
 
     [Theory]
     [InlineData("1.84.9")]
@@ -52,17 +52,17 @@ public class PreflightTests
     [InlineData("1.9.0")] // numeric, not lexical: 1.9 < 1.85
     public void Versions_below_the_floor_are_refused_naming_the_found_and_required_versions_and_the_capability(string version)
     {
-        var ex = Assert.Throws<CatalystCliException>(() => CatalystCli.EnsureSupportedVersion(["version"], VersionOutput(version)));
+        var ex = Assert.Throws<DiagridCliException>(() => DiagridCli.EnsureSupportedVersion(["version"], VersionOutput(version)));
 
         // The phrases, not bare substrings: swapping found and required would still contain both numbers.
         Assert.Contains($"is version {version},", ex.Message, StringComparison.Ordinal);
-        Assert.Contains($"needs {CatalystCli.MinimumVersion} or newer", ex.Message, StringComparison.Ordinal);
+        Assert.Contains($"needs {DiagridCli.MinimumVersion} or newer", ex.Message, StringComparison.Ordinal);
         Assert.Contains("--ignore-if-exists", ex.Message, StringComparison.Ordinal);
     }
 
     [Fact]
     public void The_floor_constant_changes_only_deliberately()
-        => Assert.Equal("1.85.0", CatalystCli.MinimumVersion);
+        => Assert.Equal("1.85.0", DiagridCli.MinimumVersion);
 
     [Theory]
     [InlineData("")]
@@ -70,7 +70,7 @@ public class PreflightTests
     [InlineData("Version: banana\n")]
     [InlineData("API server version: 1.181.0\n")] // only a differently-keyed line
     public void Output_without_a_readable_Version_line_reports_unreadable_instead_of_throwing(string stdOut)
-        => Assert.False(CatalystCli.EnsureSupportedVersion(["version"], stdOut));
+        => Assert.False(DiagridCli.EnsureSupportedVersion(["version"], stdOut));
 
     [Fact(Timeout = 30_000)]
     public async Task An_unparseable_version_warns_and_proceeds()
@@ -79,7 +79,7 @@ public class PreflightTests
         fake.SetScenario(new Scenario { Responses = [new() { ArgsMatch = "version", StdOut = "Version: banana\n" }, Whoami(), AnythingElseSucceeds()] });
         var logger = new CapturingLogger();
 
-        await new CliCatalystProvisioner().InitializeAsync(logger, default);
+        await new CliDiagridProvisioner().InitializeAsync(logger, default);
 
         var warning = Assert.Single(logger.Warnings);
         Assert.Contains("no recognisable 'Version:' line", warning, StringComparison.Ordinal);
@@ -95,7 +95,7 @@ public class PreflightTests
         fake.SetScenario(new Scenario { Responses = [new() { ArgsMatch = "version", ExitCode = 2, StdErr = "boom\n" }, Whoami(), AnythingElseSucceeds()] });
         var logger = new CapturingLogger();
 
-        await new CliCatalystProvisioner().InitializeAsync(logger, default);
+        await new CliDiagridProvisioner().InitializeAsync(logger, default);
 
         Assert.Single(logger.Warnings);
         Assert.Contains(fake.Invocations, i => i is ["whoami", ..]);
@@ -108,7 +108,7 @@ public class PreflightTests
         fake.SetScenario(Healthy());
         var logger = new CapturingLogger();
 
-        await new CliCatalystProvisioner().InitializeAsync(logger, default);
+        await new CliDiagridProvisioner().InitializeAsync(logger, default);
 
         Assert.Empty(logger.Warnings);
     }
@@ -120,7 +120,7 @@ public class PreflightTests
         using var fake = new FakeDiagridFixture();
         fake.SetScenario(new Scenario { Responses = [new() { ArgsMatch = "version", StdOut = "Version: banana\n" }, Whoami(1, "not authenticated\n")] });
 
-        var ex = await Assert.ThrowsAsync<CatalystCliException>(() => new CliCatalystProvisioner().InitializeAsync(new CapturingLogger(), default));
+        var ex = await Assert.ThrowsAsync<DiagridCliException>(() => new CliDiagridProvisioner().InitializeAsync(new CapturingLogger(), default));
 
         Assert.Contains("diagrid login", ex.Message, StringComparison.Ordinal);
     }
@@ -133,7 +133,7 @@ public class PreflightTests
         using var fake = new FakeDiagridFixture();
         fake.SetScenario(new Scenario { Responses = [Version("1.85.0"), Whoami(1, "not authenticated\n"), AnythingElseSucceeds()] });
 
-        var ex = await Assert.ThrowsAsync<CatalystCliException>(() => new CliCatalystProvisioner().InitializeAsync(new CapturingLogger(), default));
+        var ex = await Assert.ThrowsAsync<DiagridCliException>(() => new CliDiagridProvisioner().InitializeAsync(new CapturingLogger(), default));
 
         Assert.Contains("diagrid login", ex.Message, StringComparison.Ordinal);
         Assert.Contains("not authenticated", ex.Message, StringComparison.Ordinal);
@@ -148,10 +148,10 @@ public class PreflightTests
         using var fake = new FakeDiagridFixture();
         fake.SetScenario(Healthy("1.80.0"));
 
-        var ex = await Assert.ThrowsAsync<CatalystCliException>(() => new CliCatalystProvisioner().InitializeAsync(new CapturingLogger(), default));
+        var ex = await Assert.ThrowsAsync<DiagridCliException>(() => new CliDiagridProvisioner().InitializeAsync(new CapturingLogger(), default));
 
         Assert.Contains("is version 1.80.0,", ex.Message, StringComparison.Ordinal);
-        Assert.Contains($"needs {CatalystCli.MinimumVersion} or newer", ex.Message, StringComparison.Ordinal);
+        Assert.Contains($"needs {DiagridCli.MinimumVersion} or newer", ex.Message, StringComparison.Ordinal);
         Assert.Contains("--ignore-if-exists", ex.Message, StringComparison.Ordinal);
         // A too-old CLI is refused before anything else is asked of it.
         Assert.Equal([["version", "--no-color=true"]], fake.Invocations);
@@ -162,7 +162,7 @@ public class PreflightTests
     {
         using var empty = new EmptyPathFixture();
 
-        var ex = await Assert.ThrowsAsync<CatalystCliException>(() => new CliCatalystProvisioner().InitializeAsync(new CapturingLogger(), default));
+        var ex = await Assert.ThrowsAsync<DiagridCliException>(() => new CliDiagridProvisioner().InitializeAsync(new CapturingLogger(), default));
 
         Assert.Contains("docs.diagrid.io", ex.Message, StringComparison.Ordinal);
         Assert.Contains("PATH", ex.Message, StringComparison.Ordinal);
@@ -175,7 +175,7 @@ public class PreflightTests
         using var fake = new FakeDiagridFixture();
         fake.SetScenario(Healthy());
 
-        await new CliCatalystProvisioner().InitializeAsync(new CapturingLogger(), default);
+        await new CliDiagridProvisioner().InitializeAsync(new CapturingLogger(), default);
 
         Assert.Equal(
             [["version", "--no-color=true"], ["whoami", "--no-color=true"], ["product", "use", "catalyst", "--no-color=true"]],
@@ -191,7 +191,7 @@ public class PreflightTests
             Responses = [Version("1.85.0"), Whoami(), new() { ArgsMatch = "product use", ExitCode = 1, StdErr = "boom\n" }],
         });
 
-        await new CliCatalystProvisioner().InitializeAsync(new CapturingLogger(), default);
+        await new CliDiagridProvisioner().InitializeAsync(new CapturingLogger(), default);
 
         Assert.Contains(fake.Invocations, i => i is ["product", "use", "catalyst", ..]);
     }
@@ -202,7 +202,7 @@ public class PreflightTests
         using var fake = new FakeDiagridFixture();
         fake.SetScenario(new Scenario { Responses = [new() { ArgsMatch = "project use", ExitCode = 1, StdErr = "boom\n" }] });
 
-        await new CliCatalystProvisioner().UseProjectAsync("demo", default);
+        await new CliDiagridProvisioner().UseProjectAsync("demo", default);
 
         Assert.Contains(fake.Invocations, i => i is ["project", "use", "demo", ..]);
     }
@@ -216,13 +216,13 @@ public class PreflightTests
         fake.SetScenario(new Scenario { Responses = [Version("1.85.0"), Whoami(), ProjectGetReady(), AnythingElseSucceeds()] });
         var (_, handler, states) = HandlerHarness.Build();
 
-        await handler.ProvisionCatalystAsync(default);
+        await handler.ProvisionDiagridAsync(default);
         await states.Drain();
 
         var seen = states.Snapshot();
-        var checking = seen.ToList().IndexOf(CatalystLifecycleHandler.CheckingCliState);
+        var checking = seen.ToList().IndexOf(DiagridLifecycleHandler.CheckingCliState);
         var ensuring = seen.ToList().IndexOf("Ensuring project");
-        Assert.True(checking >= 0, $"never saw '{CatalystLifecycleHandler.CheckingCliState}'; saw: {string.Join(", ", seen)}");
+        Assert.True(checking >= 0, $"never saw '{DiagridLifecycleHandler.CheckingCliState}'; saw: {string.Join(", ", seen)}");
         Assert.True(checking < ensuring, $"preflight must come before provisioning; saw: {string.Join(", ", seen)}");
     }
 
@@ -233,7 +233,7 @@ public class PreflightTests
         fake.SetScenario(new Scenario { Responses = [Version("1.85.0"), Whoami(1, "not authenticated\n"), AnythingElseSucceeds()] });
         var (_, handler, states) = HandlerHarness.Build();
 
-        var ex = await Assert.ThrowsAsync<CatalystCliException>(() => handler.ProvisionCatalystAsync(default));
+        var ex = await Assert.ThrowsAsync<DiagridCliException>(() => handler.ProvisionDiagridAsync(default));
         await states.Drain();
 
         Assert.Contains("diagrid login", ex.Message, StringComparison.Ordinal);
@@ -250,13 +250,13 @@ public class PreflightTests
         fake.SetScenario(new Scenario { Responses = [new() { ArgsMatch = "version", StdOut = "Version: banana\n" }, Whoami(), ProjectGetReady(), AnythingElseSucceeds()] });
         var (_, handler, _, logs) = HandlerHarness.BuildWithLogs();
 
-        await handler.ProvisionCatalystAsync(default);
+        await handler.ProvisionDiagridAsync(default);
 
         var lines = await logs.Collect();
         Assert.Contains(lines, l => l.Content.Contains("no recognisable 'Version:' line", StringComparison.Ordinal));
     }
 
-    // Every site that catches in ProvisionCatalystAsync. Each case hangs the fake on that site's own command, waits until
+    // Every site that catches in ProvisionDiagridAsync. Each case hangs the fake on that site's own command, waits until
     // that command has demonstrably started, then cancels. Ctrl-C is not a failure: no FailedToStart, and nothing in
     // the console (the generic catch also logs the error and its stack trace, which was the actual complaint).
     [Theory(Timeout = 120_000)]
@@ -315,7 +315,7 @@ public class PreflightTests
         });
         using var cts = new CancellationTokenSource();
 
-        var provisioning = handler.ProvisionCatalystAsync(cts.Token);
+        var provisioning = handler.ProvisionDiagridAsync(cts.Token);
         var started = System.Diagnostics.Stopwatch.StartNew();
         while (!fake.Invocations.Any(i => string.Join(' ', i).StartsWith(hungCommand, StringComparison.Ordinal)))
         {

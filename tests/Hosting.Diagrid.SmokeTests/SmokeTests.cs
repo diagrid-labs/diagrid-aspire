@@ -65,17 +65,17 @@ public class SmokeTests
         {
             // The USE_CATALYST=true AppHost wiring (test-api app, kvstore, pubsub, subscription), plus an agent.
             var builder = DistributedApplication.CreateBuilder(["USE_CATALYST=true"]);
-            DemoWiring.Configure(builder, DemoWiring.UseCatalyst(builder), RepoFile("TestApi", "TestApi.csproj"), name);
-            var catalyst = builder.Resources.OfType<CatalystProject>().Single();
+            DemoWiring.Configure(builder, DemoWiring.UseDiagrid(builder), RepoFile("TestApi", "TestApi.csproj"), name);
+            var catalyst = builder.Resources.OfType<DiagridProject>().Single();
             Assert.Equal(name, catalyst.ProjectName);
-            builder.AddExecutable("my-agent", "dotnet", ".").WithCatalystAgent();
+            builder.AddExecutable("my-agent", "dotnet", ".").WithDiagridAgent();
 
             var loggers = new ResourceLoggerService();
             var notifications = new ResourceNotificationService(
                 NullLogger<ResourceNotificationService>.Instance, new HostLifetimeStub(), new EmptyServiceProvider(), loggers);
-            var provisioner = new CliCatalystProvisioner();
-            await new CatalystLifecycleHandler(catalyst, loggers, notifications, provisioner)
-                .ProvisionCatalystAsync(CancellationToken.None);
+            var provisioner = new CliDiagridProvisioner();
+            await new DiagridLifecycleHandler(catalyst, loggers, notifications, provisioner)
+                .ProvisionDiagridAsync(CancellationToken.None);
 
             // The DAPR_* variables are built from exactly these values.
             Assert.False(string.IsNullOrWhiteSpace(await catalyst.HttpEndpoint.Task), "DAPR_HTTP_ENDPOINT would be empty");

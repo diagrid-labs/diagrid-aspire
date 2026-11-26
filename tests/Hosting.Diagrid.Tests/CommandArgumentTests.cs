@@ -163,7 +163,7 @@ public class CommandArgumentTests
     // Every argument builder in Commands, by name. Identity builders appear once per kind.
     private static (string Name, string[] Args)[] AllBuilderOutputs() =>
     [
-        (nameof(Commands.BuildUseCatalystArgs), Commands.BuildUseCatalystArgs()),
+        (nameof(Commands.BuildUseDiagridArgs), Commands.BuildUseDiagridArgs()),
         (nameof(Commands.BuildVersionArgs), Commands.BuildVersionArgs()),
         (nameof(Commands.BuildWhoamiArgs), Commands.BuildWhoamiArgs()),
         (nameof(Commands.BuildUseProjectArgs), Commands.BuildUseProjectArgs("demo")),
@@ -207,7 +207,7 @@ public class CommandArgumentTests
     [Fact]
     public void ParseJson_reports_truncation_as_a_cli_exception_with_exit_code_zero()
     {
-        var ex = Assert.Throws<CatalystCliException>(() => Commands.ParseJson(
+        var ex = Assert.Throws<DiagridCliException>(() => Commands.ParseJson(
             Truncated(true), ["app", "get", "a"], json => JsonSerializer.Deserialize<CliIdentityDetailsProbe>(json)));
 
         Assert.Equal(0, ex.ExitCode);

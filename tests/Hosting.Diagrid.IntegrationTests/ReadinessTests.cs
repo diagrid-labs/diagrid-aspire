@@ -31,7 +31,7 @@ public class ReadinessTests
         // First project get is pending, every later one is ready.
         fake.SetScenario(new Scenario { Responses = [ProjectGetPending(times: 1), ProjectGetReady()] });
 
-        var details = await new CliCatalystProvisioner()
+        var details = await new CliDiagridProvisioner()
             .WaitForProjectReadyAsync("demo", TimeSpan.FromSeconds(10), default);
 
         Assert.Equal(new Uri("https://http-prj00000000.cloud.r1.diagrid.io:443"), details.HttpEndpoint);
@@ -45,7 +45,7 @@ public class ReadinessTests
         using var fake = new FakeDiagridFixture();
         fake.SetScenario(new Scenario { Responses = [ProjectGetReady()] });
 
-        await new CliCatalystProvisioner().WaitForProjectReadyAsync("demo", TimeSpan.FromSeconds(10), default);
+        await new CliDiagridProvisioner().WaitForProjectReadyAsync("demo", TimeSpan.FromSeconds(10), default);
 
         Assert.Equal(1, ProjectGets(fake));
     }
@@ -56,7 +56,7 @@ public class ReadinessTests
         using var fake = new FakeDiagridFixture();
         fake.SetScenario(new Scenario { Responses = [ProjectGetPending()] });
 
-        Assert.Null(await new CliCatalystProvisioner().TryGetProjectDetailsAsync("demo", default));
+        Assert.Null(await new CliDiagridProvisioner().TryGetProjectDetailsAsync("demo", default));
     }
 
     [Fact(Timeout = 30_000)]
@@ -66,7 +66,7 @@ public class ReadinessTests
         fake.SetScenario(new Scenario { Responses = [ProjectGetPending()] });
 
         var ex = await Assert.ThrowsAsync<TimeoutException>(
-            () => new CliCatalystProvisioner().WaitForProjectReadyAsync("demo", TimeSpan.FromSeconds(2), default));
+            () => new CliDiagridProvisioner().WaitForProjectReadyAsync("demo", TimeSpan.FromSeconds(2), default));
 
         Assert.Contains("'demo'", ex.Message, StringComparison.Ordinal);
         Assert.Matches(@"after \d+s", ex.Message);
@@ -103,7 +103,7 @@ public class ReadinessTests
 
         var stopwatch = Stopwatch.StartNew();
         await Assert.ThrowsAnyAsync<OperationCanceledException>(
-            () => new CliCatalystProvisioner().WaitForProjectReadyAsync("demo", TimeSpan.FromMinutes(5), cts.Token));
+            () => new CliDiagridProvisioner().WaitForProjectReadyAsync("demo", TimeSpan.FromMinutes(5), cts.Token));
 
         // The 5 minute timeout is the mutation this catches: a loop that ignored the token would run to it.
         Assert.True(stopwatch.Elapsed < TimeSpan.FromSeconds(10), $"took {stopwatch.Elapsed}");
@@ -121,12 +121,12 @@ public class ReadinessTests
         });
         var (project, handler, states) = Build();
 
-        await handler.ProvisionCatalystAsync(default);
+        await handler.ProvisionDiagridAsync(default);
 
         Assert.Equal("https://http-prj00000000.cloud.r1.diagrid.io/", await project.HttpEndpoint.Task);
         Assert.Equal("https://grpc-prj00000000.cloud.r1.diagrid.io/", await project.GrpcEndpoint.Task);
         Assert.Equal(3, ProjectGets(fake));
-        Assert.Contains(CatalystLifecycleHandler.WaitingForProjectState, states.Snapshot());
+        Assert.Contains(DiagridLifecycleHandler.WaitingForProjectState, states.Snapshot());
     }
 
     [Fact(Timeout = 60_000)]
@@ -137,9 +137,9 @@ public class ReadinessTests
         var (project, handler, states) = Build();
         using var cts = new CancellationTokenSource();
 
-        var provisioning = handler.ProvisionCatalystAsync(cts.Token);
+        var provisioning = handler.ProvisionDiagridAsync(cts.Token);
         // Cancel only once the handler is demonstrably inside the wait, however slow the machine is.
-        await states.WaitFor(CatalystLifecycleHandler.WaitingForProjectState, TimeSpan.FromSeconds(20));
+        await states.WaitFor(DiagridLifecycleHandler.WaitingForProjectState, TimeSpan.FromSeconds(20));
         var stopwatch = Stopwatch.StartNew();
         cts.Cancel();
 
@@ -156,6 +156,6 @@ public class ReadinessTests
         Assert.NotEqual(KnownResourceStates.Active, seen[^1]);
     }
 
-    private static (CatalystProject Project, CatalystLifecycleHandler Handler, HandlerHarness.StateRecorder States) Build()
+    private static (DiagridProject Project, DiagridLifecycleHandler Handler, HandlerHarness.StateRecorder States) Build()
         => HandlerHarness.Build();
 }

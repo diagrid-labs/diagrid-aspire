@@ -15,7 +15,7 @@ namespace Diagrid.Aspire.Hosting.Cli;
 /// </param>
 internal sealed record CliResult(string StdOut, string StdErr, int ExitCode, bool OutputTruncated = false)
 {
-    /// <summary>Throws <see cref="CatalystCliException"/> carrying the cleaned stderr when the exit code is non-zero.</summary>
+    /// <summary>Throws <see cref="DiagridCliException"/> carrying the cleaned stderr when the exit code is non-zero.</summary>
     public void EnsureSuccess(IReadOnlyList<string> arguments)
     {
         if (ExitCode == 0)
@@ -24,10 +24,10 @@ internal sealed record CliResult(string StdOut, string StdErr, int ExitCode, boo
         }
 
         var cleaned = StdErrCleaner.Clean(StdErr);
-        throw new CatalystCliException(
+        throw new DiagridCliException(
             arguments,
             ExitCode,
             cleaned,
-            CatalystCliException.BuildMessage(arguments, ExitCode, cleaned, OutputTruncated));
+            DiagridCliException.BuildMessage(arguments, ExitCode, cleaned, OutputTruncated));
     }
 }
