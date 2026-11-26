@@ -56,12 +56,12 @@ dotnet add package Diagrid.Aspire.Hosting
 At a minimum, you must always add the following to your project to enable the integration:
 
 ```csharp
-builder.AddCatalystProject("your-desired-project-name");
+builder.AddDiagridProject("your-desired-project-name");
 ```
 
 This will ensure that a Diagrid project exists or that you are connected to an existing one.
 
-**Pass a project name.** `AddCatalystProject()` with no name throws for AppHosts that use top-level statements, which is the default Aspire template: their entry point is `Program` in the global namespace, so there is no namespace to derive a name from.
+**Pass a project name.** `AddDiagridProject()` with no name throws for AppHosts that use top-level statements, which is the default Aspire template: their entry point is `Program` in the global namespace, so there is no namespace to derive a name from.
 
 After that, you can start defining your [Diagrid appids](https://docs.diagrid.io/develop/connect/) by annotating
 your project resources and containers:
@@ -69,10 +69,10 @@ your project resources and containers:
 ```csharp
 builder
     .AddProject<MyProject>("my-project")
-    .WithCatalystApp();
+    .WithDiagridApp();
 ```
 
-Each resource that you tag in this way will automatically have an application entry created in the Diagrid Console. Use `WithCatalystAgent()` instead to register the resource as a Diagrid agent — support for that depends on the Diagrid deployment, and where there is no agent API, provisioning fails naming the resource. `WithCatalyst()` is an equivalent alias of `WithCatalystApp()`.
+Each resource that you tag in this way will automatically have an application entry created in the Diagrid Console. Use `WithDiagridAgent()` instead to register the resource as a Diagrid agent — support for that depends on the Diagrid deployment, and where there is no agent API, provisioning fails naming the resource. `WithDiagrid()` is an equivalent alias of `WithDiagridApp()`.
 
 Resources with no HTTP endpoint, such as workflow-only workers, are supported.
 
@@ -82,10 +82,10 @@ The link to the Diagrid Console is derived from the `DIAGRID_URL` variable, usin
 
 #### Project options
 
-`AddCatalystProject` takes an optional `ProjectDescriptor` that controls how the project is created:
+`AddDiagridProject` takes an optional `ProjectDescriptor` that controls how the project is created:
 
 ```csharp
-builder.AddCatalystProject("your-project", new ProjectDescriptor
+builder.AddDiagridProject("your-project", new ProjectDescriptor
 {
     Region = "your-region",
     EnableManagedWorkflow = true,
@@ -117,19 +117,19 @@ To ensure these services are available in your project, add the following to you
 
 ```csharp
 builder
-    .AddCatalystProject("your-desired-project-name")
-    .WithCatalystKvStore("your-desired-kv-name")
-    .WithCatalystPubSub("your-desired-pubsub-name");
+    .AddDiagridProject("your-desired-project-name")
+    .WithDiagridKvStore("your-desired-kv-name")
+    .WithDiagridPubSub("your-desired-pubsub-name");
 ```
 
-With no name, `WithCatalystKvStore()` creates a store called `kvstore`. Pass a name when the store has to match a Dapr state store component your services already address — that is the one line that switching from Dapr OSS costs.
+With no name, `WithDiagridKvStore()` creates a store called `kvstore`. Pass a name when the store has to match a Dapr state store component your services already address — that is the one line that switching from Dapr OSS costs.
 
 ### Components
 
 Diagrid supports [a variety of components](https://docs.diagrid.io/references/components-reference/intro) that you can use
 when building your applications.
 
-Creating a managed KV store or pub/sub through `WithCatalystKvStore` or `WithCatalystPubSub` also creates a component with the same name, so you do not need `WithComponent` for the basic case. Your services can use `your-desired-kv-name` as their state store name straight away. Do not register a component under the same name as the service; that conflicts with the one the CLI creates.
+Creating a managed KV store or pub/sub through `WithDiagridKvStore` or `WithDiagridPubSub` also creates a component with the same name, so you do not need `WithComponent` for the basic case. Your services can use `your-desired-kv-name` as their state store name straight away. Do not register a component under the same name as the service; that conflicts with the one the CLI creates.
 
 If a component already exists under the store's name, the CLI's create can succeed without creating a store. Provisioning detects that and fails, naming the component, instead of carrying on.
 
@@ -137,8 +137,8 @@ Use `WithComponent` for additional or customized components, for example a secon
 
 ```csharp
 builder
-    .AddCatalystProject("your-desired-project-name")
-    .WithCatalystKvStore("your-desired-kv-name")
+    .AddDiagridProject("your-desired-project-name")
+    .WithDiagridKvStore("your-desired-kv-name")
     .WithComponent("your-desired-kv-component", new DiagridStateStore
     {
         Scopes = ["my-project"],
@@ -173,21 +173,21 @@ Generated subscription names are `{app}-pubsub-{topic}`.
 
 ### Agents and the default service names
 
-Adding an agent with `WithCatalystAgent()` has a side effect worth knowing about: creating a project's **first** agent makes Diagrid provision a managed KV store named **`kvstore`** and a managed pub/sub named **`pubsub`** to back the agent registry — the same two names `WithCatalystKvStore()` and `WithCatalystPubSub()` default to. Two consequences:
+Adding an agent with `WithDiagridAgent()` has a side effect worth knowing about: creating a project's **first** agent makes Diagrid provision a managed KV store named **`kvstore`** and a managed pub/sub named **`pubsub`** to back the agent registry — the same two names `WithDiagridKvStore()` and `WithDiagridPubSub()` default to. Two consequences:
 
 - **Those services are created without a fronting component.** A later `kv create kvstore` is refused as "already exists", which `--ignore-if-exists` reports as success, so the component your app addresses would never appear. This integration detects that and creates the missing component itself, so `SaveStateAsync("kvstore", …)` works either way. You do not need to do anything.
 - **They count against your plan's per-project limits.** If your organization allows one KV store per project, the agent's `kvstore` is it, and asking for a second under a different name fails with a quota error naming the region. Either reuse the default name or raise the limit with Diagrid support.
 
 ### Actor state stores
 
-`WithCatalystKvStore()` does not set `actorStateStore`. With `EnableManagedWorkflow = true`, Diagrid already provisions a `workflows-state` store carrying `actorStateStore: "true"` (set in the Diagrid control plane's project controller), and the sidecar picks the first in-scope flagged store by map iteration order. A second flagged store would make that choice arbitrary.
+`WithDiagridKvStore()` does not set `actorStateStore`. With `EnableManagedWorkflow = true`, Diagrid already provisions a `workflows-state` store carrying `actorStateStore: "true"` (set in the Diagrid control plane's project controller), and the sidecar picks the first in-scope flagged store by map iteration order. A second flagged store would make that choice arbitrary.
 
 If you want your own store to hold actor state, opt in explicitly through `DiagridStateStore`:
 
 ```csharp
 builder
-    .AddCatalystProject("your-project")
-    .WithCatalystKvStore("your-kv")
+    .AddDiagridProject("your-project")
+    .WithDiagridKvStore("your-kv")
     .WithComponent("your-actor-state", new DiagridStateStore
     {
         Scopes = ["your-app"],
@@ -270,8 +270,9 @@ next one.
 **Two types have no compatibility form.** `CatalystProject` is `DiagridProject` and
 `CliCatalystProvisioner` is `CliDiagridProvisioner`, with no obsolete alias, because
 `IResourceBuilder<T>` is invariant and an obsolete base would not satisfy code expecting the old type.
-If you name either in a variable declaration, edit it. `CatalystCliException` and
-`ICatalystProvisioner` do have one, so an existing `catch` or implementation still compiles.
+If you name either in a variable declaration, edit it. `CatalystCliException`,
+`ICatalystProvisioner`, `ICatalystComponent` and `ICatalystComponent<TMetadata>` all do have one, so an
+existing `catch` or implementation still compiles.
 
 **Provisioned resources are renamed.** A project resource is now `diagrid-{projectName}` and its proxy
 `{name}-diagrid-proxy`. The suffix is one character shorter, so the longest usable project name goes

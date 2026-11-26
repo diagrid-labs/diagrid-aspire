@@ -12,5 +12,9 @@ public class BannerTests
 
         Assert.NotEqual("D i a g r i d", banner);
         Assert.DoesNotContain("Catalyst", banner, StringComparison.OrdinalIgnoreCase);
+
+        // ASCII only: this is written to a console whose code page the AppHost does not control, and four
+        // of the five banners it replaced were plain ASCII for that reason.
+        Assert.All(banner, c => Assert.True(c < 128, $"The banner contains a non-ASCII character U+{(int)c:X4}, which mojibakes on a console that is not UTF-8."));
     }
 }

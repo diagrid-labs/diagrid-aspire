@@ -42,5 +42,32 @@ public class CompatibilityLayerTests
     public void TheOldProvisionerInterfaceStillSatisfiesTheNewOne()
         => Assert.True(typeof(global::Diagrid.Aspire.Hosting.IDiagridProvisioner)
             .IsAssignableFrom(typeof(global::Diagrid.Aspire.Hosting.ICatalystProvisioner)));
+
+    // Source compatibility includes parameter names: a 1.0.0 AppHost may have called these with named
+    // arguments. Renaming a forwarder's parameter turns the layer that exists to prevent a compile error
+    // into one. Neither public-surface.txt nor the attribute test above can see parameter names.
+    [Fact]
+    public void ForwardersKeepTheParameterNamesTheOldApiHad()
+    {
+        var forwarders = typeof(global::Diagrid.Aspire.Hosting.ResourceBuilderExtensions)
+            .GetMethods(BindingFlags.Public | BindingFlags.Static)
+            .Where(m => m.Name.Contains("Catalyst", StringComparison.Ordinal));
+
+        foreach (var m in forwarders)
+        {
+            Assert.All(m.GetParameters(), p => Assert.False(
+                p.Name!.StartsWith("diagrid", StringComparison.Ordinal),
+                $"{m.Name} has a parameter named {p.Name}; forwarders must keep the 1.0.0 names so named arguments still compile."));
+        }
+    }
+
+    [Fact]
+    public void TheOldComponentInterfacesStillSatisfyTheNewOnes()
+    {
+        Assert.True(typeof(global::Diagrid.Aspire.Hosting.IDiagridComponent)
+            .IsAssignableFrom(typeof(global::Diagrid.Aspire.Hosting.ICatalystComponent)));
+        Assert.True(typeof(global::Diagrid.Aspire.Hosting.IDiagridComponent<>)
+            .IsAssignableFrom(typeof(global::Diagrid.Aspire.Hosting.ICatalystComponent<>).GetInterfaces()[0].GetGenericTypeDefinition()));
+    }
 }
 #pragma warning restore CS0618

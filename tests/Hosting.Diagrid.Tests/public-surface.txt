@@ -240,6 +240,8 @@ type Diagrid.Aspire.Hosting.ComponentSpec.DiagridStateSpecMetadata
 type Diagrid.Aspire.Hosting.ComponentSpec.DiagridStateStore
 type Diagrid.Aspire.Hosting.DiagridCliException
 type Diagrid.Aspire.Hosting.DiagridProject
+type Diagrid.Aspire.Hosting.ICatalystComponent
+type Diagrid.Aspire.Hosting.ICatalystComponent`1
 type Diagrid.Aspire.Hosting.ICatalystProvisioner
 type Diagrid.Aspire.Hosting.IDiagridComponent
 type Diagrid.Aspire.Hosting.IDiagridComponent`1

@@ -42,6 +42,7 @@
     <Content Include="..\..\.github\workflows\ci.yaml" Link="packaging\ci.yaml" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="..\..\global.json" Link="packaging\global.json" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="..\..\Directory.Build.props" Link="packaging\Directory.Build.props" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\readme.md" Link="packaging\readme.md" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="Hosting.Diagrid.Tests.csproj" Link="packaging\Hosting.Diagrid.Tests.csproj" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="..\Hosting.Diagrid.IntegrationTests\Hosting.Diagrid.IntegrationTests.csproj" Link="packaging\Hosting.Diagrid.IntegrationTests.csproj" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="..\Hosting.Diagrid.SmokeTests\Hosting.Diagrid.SmokeTests.csproj" Link="packaging\Hosting.Diagrid.SmokeTests.csproj" CopyToOutputDirectory="PreserveNewest" />
