@@ -1,3 +1,7 @@
+Diagrid.Aspire.Hosting.CatalystCliException..ctor(System.Collections.Generic.IReadOnlyList`1<System.String>, System.Int32, System.String, System.String, System.Exception) : void
+Diagrid.Aspire.Hosting.CatalystCliException.Arguments[] : System.Collections.Generic.IReadOnlyList`1<System.String> { get; }
+Diagrid.Aspire.Hosting.CatalystCliException.ExitCode[] : System.Int32 { get; }
+Diagrid.Aspire.Hosting.CatalystCliException.StdErr[] : System.String { get; }
 Diagrid.Aspire.Hosting.Cli.CliDiagridProvisioner..ctor() : void
 Diagrid.Aspire.Hosting.Cli.CliDiagridProvisioner.CreateAgentAsync(System.String, System.String, System.Threading.CancellationToken) : System.Threading.Tasks.Task
 Diagrid.Aspire.Hosting.Cli.CliDiagridProvisioner.CreateAppAsync(System.String, System.String, System.Threading.CancellationToken) : System.Threading.Tasks.Task
@@ -129,9 +133,6 @@ Diagrid.Aspire.Hosting.ComponentSpec.DiagridStateStore.Metadata[] : Diagrid.Aspi
 Diagrid.Aspire.Hosting.ComponentSpec.DiagridStateStore.Scopes[] : System.Collections.Generic.IList`1<System.String> { get; set; }
 Diagrid.Aspire.Hosting.ComponentSpec.DiagridStateStore.Type[] : System.String { get; }
 Diagrid.Aspire.Hosting.DiagridCliException..ctor(System.Collections.Generic.IReadOnlyList`1<System.String>, System.Int32, System.String, System.String, System.Exception) : void
-Diagrid.Aspire.Hosting.DiagridCliException.Arguments[] : System.Collections.Generic.IReadOnlyList`1<System.String> { get; }
-Diagrid.Aspire.Hosting.DiagridCliException.ExitCode[] : System.Int32 { get; }
-Diagrid.Aspire.Hosting.DiagridCliException.StdErr[] : System.String { get; }
 Diagrid.Aspire.Hosting.DiagridProject..ctor() : void
 Diagrid.Aspire.Hosting.DiagridProject.Annotations[] : Aspire.Hosting.ApplicationModel.ResourceAnnotationCollection { get; set; }
 Diagrid.Aspire.Hosting.DiagridProject.Name[] : System.String { get; }
@@ -191,9 +192,17 @@ Diagrid.Aspire.Hosting.Model.SubscriptionDescriptor.Name[] : System.String { get
 Diagrid.Aspire.Hosting.Model.SubscriptionDescriptor.Route[] : System.String { get; set; }
 Diagrid.Aspire.Hosting.Model.SubscriptionDescriptor.Scopes[] : System.Collections.Generic.IList`1<System.String> { get; set; }
 Diagrid.Aspire.Hosting.Model.SubscriptionDescriptor.Topic[] : System.String { get; set; }
+Diagrid.Aspire.Hosting.ResourceBuilderExtensions.AddCatalystProject(Aspire.Hosting.IDistributedApplicationBuilder, System.String, Diagrid.Aspire.Hosting.Model.ProjectDescriptor) : Aspire.Hosting.ApplicationModel.IResourceBuilder`1<Diagrid.Aspire.Hosting.DiagridProject>
 Diagrid.Aspire.Hosting.ResourceBuilderExtensions.AddDiagridProject(Aspire.Hosting.IDistributedApplicationBuilder, System.String, Diagrid.Aspire.Hosting.Model.ProjectDescriptor) : Aspire.Hosting.ApplicationModel.IResourceBuilder`1<Diagrid.Aspire.Hosting.DiagridProject>
 Diagrid.Aspire.Hosting.ResourceBuilderExtensions.SampleKvName : System.String
 Diagrid.Aspire.Hosting.ResourceBuilderExtensions.SamplePubsubName : System.String
+Diagrid.Aspire.Hosting.ResourceBuilderExtensions.WithCatalyst(Aspire.Hosting.ApplicationModel.IResourceBuilder`1<TResource>, Aspire.Hosting.ApplicationModel.IResourceBuilder`1<Diagrid.Aspire.Hosting.DiagridProject>) : Aspire.Hosting.ApplicationModel.IResourceBuilder`1<TResource>
+Diagrid.Aspire.Hosting.ResourceBuilderExtensions.WithCatalystAgent(Aspire.Hosting.ApplicationModel.IResourceBuilder`1<TResource>, Aspire.Hosting.ApplicationModel.IResourceBuilder`1<Diagrid.Aspire.Hosting.DiagridProject>) : Aspire.Hosting.ApplicationModel.IResourceBuilder`1<TResource>
+Diagrid.Aspire.Hosting.ResourceBuilderExtensions.WithCatalystApp(Aspire.Hosting.ApplicationModel.IResourceBuilder`1<TResource>, Aspire.Hosting.ApplicationModel.IResourceBuilder`1<Diagrid.Aspire.Hosting.DiagridProject>) : Aspire.Hosting.ApplicationModel.IResourceBuilder`1<TResource>
+Diagrid.Aspire.Hosting.ResourceBuilderExtensions.WithCatalystKvStore(Aspire.Hosting.ApplicationModel.IResourceBuilder`1<Diagrid.Aspire.Hosting.DiagridProject>) : Aspire.Hosting.ApplicationModel.IResourceBuilder`1<Diagrid.Aspire.Hosting.DiagridProject>
+Diagrid.Aspire.Hosting.ResourceBuilderExtensions.WithCatalystKvStore(Aspire.Hosting.ApplicationModel.IResourceBuilder`1<Diagrid.Aspire.Hosting.DiagridProject>, System.String, System.Collections.Generic.IList`1<System.String>) : Aspire.Hosting.ApplicationModel.IResourceBuilder`1<Diagrid.Aspire.Hosting.DiagridProject>
+Diagrid.Aspire.Hosting.ResourceBuilderExtensions.WithCatalystPubSub(Aspire.Hosting.ApplicationModel.IResourceBuilder`1<Diagrid.Aspire.Hosting.DiagridProject>) : Aspire.Hosting.ApplicationModel.IResourceBuilder`1<Diagrid.Aspire.Hosting.DiagridProject>
+Diagrid.Aspire.Hosting.ResourceBuilderExtensions.WithCatalystPubSub(Aspire.Hosting.ApplicationModel.IResourceBuilder`1<Diagrid.Aspire.Hosting.DiagridProject>, System.String, System.Collections.Generic.IList`1<System.String>) : Aspire.Hosting.ApplicationModel.IResourceBuilder`1<Diagrid.Aspire.Hosting.DiagridProject>
 Diagrid.Aspire.Hosting.ResourceBuilderExtensions.WithComponent(Aspire.Hosting.ApplicationModel.IResourceBuilder`1<Diagrid.Aspire.Hosting.DiagridProject>, System.String, Diagrid.Aspire.Hosting.IDiagridComponent`1<TMetadata>) : Aspire.Hosting.ApplicationModel.IResourceBuilder`1<Diagrid.Aspire.Hosting.DiagridProject>
 Diagrid.Aspire.Hosting.ResourceBuilderExtensions.WithComponent(Aspire.Hosting.ApplicationModel.IResourceBuilder`1<Diagrid.Aspire.Hosting.DiagridProject>, System.String, System.String, System.Collections.Generic.IDictionary`2<System.String, System.Object>, System.Collections.Generic.IList`1<System.String>) : Aspire.Hosting.ApplicationModel.IResourceBuilder`1<Diagrid.Aspire.Hosting.DiagridProject>
 Diagrid.Aspire.Hosting.ResourceBuilderExtensions.WithDiagrid(Aspire.Hosting.ApplicationModel.IResourceBuilder`1<TResource>, Aspire.Hosting.ApplicationModel.IResourceBuilder`1<Diagrid.Aspire.Hosting.DiagridProject>) : Aspire.Hosting.ApplicationModel.IResourceBuilder`1<TResource>
@@ -207,6 +216,7 @@ Diagrid.Aspire.Hosting.ResourceBuilderExtensions.WithSubscription(Aspire.Hosting
 Diagrid.Aspire.Hosting.ResourceBuilderExtensions.WithSubscription(Aspire.Hosting.ApplicationModel.IResourceBuilder`1<TResource>, System.String, System.String, System.String, System.String) : Aspire.Hosting.ApplicationModel.IResourceBuilder`1<TResource>
 Diagrid.Aspire.Hosting.ResourceBuilderExtensions.WithSubscription(Aspire.Hosting.ApplicationModel.IResourceBuilder`1<TResource>, System.String, System.String, System.String, System.String, System.Boolean, System.Nullable`1<System.Int32>, System.Nullable`1<System.TimeSpan>) : Aspire.Hosting.ApplicationModel.IResourceBuilder`1<TResource>
 Projects.Hosting_Diagrid.ProjectPath[] : System.String { get; }
+type Diagrid.Aspire.Hosting.CatalystCliException
 type Diagrid.Aspire.Hosting.Cli.CliDiagridProvisioner
 type Diagrid.Aspire.Hosting.Cli.Options.CreateComponentOptions
 type Diagrid.Aspire.Hosting.Cli.Options.CreateIdentityOptions
@@ -230,6 +240,7 @@ type Diagrid.Aspire.Hosting.ComponentSpec.DiagridStateSpecMetadata
 type Diagrid.Aspire.Hosting.ComponentSpec.DiagridStateStore
 type Diagrid.Aspire.Hosting.DiagridCliException
 type Diagrid.Aspire.Hosting.DiagridProject
+type Diagrid.Aspire.Hosting.ICatalystProvisioner
 type Diagrid.Aspire.Hosting.IDiagridComponent
 type Diagrid.Aspire.Hosting.IDiagridComponent`1
 type Diagrid.Aspire.Hosting.IDiagridProvisioner

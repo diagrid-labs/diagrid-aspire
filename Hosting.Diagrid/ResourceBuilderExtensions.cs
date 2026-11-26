@@ -13,7 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Diagrid.Aspire.Hosting;
 
-public static class ResourceBuilderExtensions
+public static partial class ResourceBuilderExtensions
 {
     /// <summary>
     ///     The name <see cref="WithDiagridKvStore(IResourceBuilder{DiagridProject})"/> gives the store it creates.

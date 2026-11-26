@@ -99,3 +99,10 @@ public interface IDiagridProvisioner
     /// </summary>
     Task<bool> PubSubExistsAsync(string name, string projectName, CancellationToken cancellationToken);
 }
+
+/// <summary>Renamed to <see cref="IDiagridProvisioner"/>. Kept for one minor release so an existing
+/// implementation still compiles and still satisfies the new interface.</summary>
+[Obsolete("Renamed to IDiagridProvisioner. Catalyst is now Diagrid; this type is removed in the next minor.")]
+public interface ICatalystProvisioner : IDiagridProvisioner
+{
+}

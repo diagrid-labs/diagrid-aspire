@@ -4,7 +4,12 @@ using System.Collections.Generic;
 namespace Diagrid.Aspire.Hosting;
 
 /// <summary>Raised when the <c>diagrid</c> CLI fails, times out, or cannot be run.</summary>
-public sealed class DiagridCliException : Exception
+// Derives from the obsolete CatalystCliException for one minor release, so an existing
+// catch (CatalystCliException) still catches this. CS0618 is suppressed only here, at the one site where
+// deriving from an obsolete base is the entire point; when the base goes, its members move back in here.
+#pragma warning disable CS0618
+public sealed class DiagridCliException : CatalystCliException
+#pragma warning restore CS0618
 {
     public DiagridCliException(
         IReadOnlyList<string> arguments,
@@ -13,44 +18,7 @@ public sealed class DiagridCliException : Exception
         string? message = null,
         Exception? innerException = null
     )
-        : base(message ?? BuildMessage(arguments, exitCode, stdErr), innerException)
+        : base(arguments, exitCode, stdErr, message, innerException)
     {
-        Arguments = arguments;
-        ExitCode = exitCode;
-        StdErr = stdErr;
-    }
-
-    public IReadOnlyList<string> Arguments { get; }
-
-    /// <summary>
-    /// The CLI's exit code. Can be 0 when the CLI succeeded but its output was cut off and could not be read;
-    /// <see cref="Exception.Message"/> says so in that case.
-    /// </summary>
-    public int ExitCode { get; }
-
-    /// <summary>
-    /// The CLI's stderr after cleaning (escape sequences and the update notice removed), NOT verbatim output.
-    /// </summary>
-    public string StdErr { get; }
-
-    internal static string BuildMessage(
-        IReadOnlyList<string> arguments,
-        int exitCode,
-        string stdErr,
-        bool outputTruncated = false
-    )
-    {
-        var message = $"'diagrid {string.Join(" ", arguments)}' failed with exit code {exitCode}.";
-        if (!string.IsNullOrWhiteSpace(stdErr))
-        {
-            message += $" {stdErr.Trim()}";
-        }
-
-        if (outputTruncated)
-        {
-            message += " (The CLI's output was cut off, so the error text above may be incomplete.)";
-        }
-
-        return message;
     }
 }
