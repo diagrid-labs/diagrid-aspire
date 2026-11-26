@@ -17,7 +17,7 @@ public class ResourceBuilderTests
         Assert.NotEmpty(viaApp);
         Assert.Equal(viaAlias, viaApp);
         // Guards against a vacuous comparison: the graph must include the proxy and its arguments.
-        Assert.Contains(viaApp, line => line.StartsWith("worker-catalyst-proxy args:", StringComparison.Ordinal));
+        Assert.Contains(viaApp, line => line.StartsWith("worker-diagrid-proxy args:", StringComparison.Ordinal));
     }
 
     [Fact]
@@ -96,18 +96,18 @@ public class ResourceBuilderTests
     }
 
     // Aspire accepts resource names up to 64 characters (measured: 64 ok, 65 rejected with ASPIRE006).
-    // The proxy is named "{name}-catalyst-proxy", 15 characters longer, so the longest usable name is 49.
+    // The proxy is named "{name}-diagrid-proxy", 14 characters longer, so the longest usable name is 50.
     [Fact]
     public void Accepts_a_resource_name_whose_proxy_name_is_exactly_at_the_aspire_limit()
     {
         var builder = DistributedApplication.CreateBuilder();
         var catalyst = builder.AddDiagridProject("demo");
-        var name = new string('a', 49);
+        var name = new string('a', 50);
 
         builder.AddExecutable(name, "dotnet", ".").WithDiagridApp();
 
         Assert.Single(catalyst.Resource.Identities);
-        Assert.Equal(64, $"{name}-catalyst-proxy".Length);
+        Assert.Equal(64, $"{name}-diagrid-proxy".Length);
     }
 
     [Fact]
@@ -115,7 +115,8 @@ public class ResourceBuilderTests
     {
         var builder = DistributedApplication.CreateBuilder();
         builder.AddDiagridProject("demo");
-        var name = new string('a', 50);
+        // One past the ceiling: the proxy suffix is 14 characters, so 51 makes a 65-character proxy name.
+        var name = new string('a', 51);
         var resource = builder.AddExecutable(name, "dotnet", ".");
 
         var ex = Assert.Throws<ArgumentException>(() => resource.WithDiagridApp());
@@ -173,7 +174,7 @@ public class ResourceBuilderTests
         var proxy = owner.Annotations.OfType<ResourceRelationshipAnnotation>()
             .Select(a => a.Resource)
             .OfType<ExecutableResource>()
-            .Single(r => r.Name == $"{resourceName}-catalyst-proxy");
+            .Single(r => r.Name == $"{resourceName}-diagrid-proxy");
         return proxy;
     }
 
@@ -202,7 +203,7 @@ public class ResourceBuilderTests
         foreach (var resource in builder.Resources.OrderBy(r => r.Name, StringComparer.Ordinal))
         {
             lines.Add($"{resource.Name} [{string.Join(",", resource.Annotations.Select(a => a.GetType().Name).OrderBy(n => n, StringComparer.Ordinal))}]");
-            if (resource is ExecutableResource exe && exe.Name.EndsWith("-catalyst-proxy", StringComparison.Ordinal))
+            if (resource is ExecutableResource exe && exe.Name.EndsWith("-diagrid-proxy", StringComparison.Ordinal))
             {
                 lines.Add($"{exe.Name} args: {string.Join(" ", ArgsOf(exe))}");
             }

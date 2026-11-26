@@ -83,7 +83,7 @@ public class AgentTests
         var proxy = owner.Annotations.OfType<ResourceRelationshipAnnotation>()
             .Select(a => a.Resource)
             .OfType<ExecutableResource>()
-            .Single(r => r.Name == $"{owner.Name}-catalyst-proxy");
+            .Single(r => r.Name == $"{owner.Name}-diagrid-proxy");
 
         var args = new List<object>();
         var context = new CommandLineArgsCallbackContext(args, proxy);

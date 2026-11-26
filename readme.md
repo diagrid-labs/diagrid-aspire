@@ -76,7 +76,7 @@ Each resource that you tag in this way will automatically have an application en
 
 Resources with no HTTP endpoint, such as workflow-only workers, are supported.
 
-**Resource names are validated.** A name that is not a valid Diagrid name is rejected, as is one whose derived `{name}-catalyst-proxy` resource would exceed Aspire's 64-character limit — so names longer than 49 characters.
+**Resource names are validated.** A name that is not a valid Diagrid name is rejected, as is one whose derived `{name}-diagrid-proxy` resource would exceed Aspire's 64-character limit — so names longer than 50 characters.
 
 The link to the Diagrid Console is derived from the `DIAGRID_URL` variable, using the same rules as the Diagrid CLI. For the default API URL it points at `catalyst.diagrid.io`.
 

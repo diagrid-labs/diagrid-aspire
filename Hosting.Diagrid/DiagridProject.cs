@@ -13,7 +13,7 @@ public class DiagridProject : IResource
     /// <summary>
     ///     The label of the resource in Aspire. See ProjectName for the label that will be used in Diagrid.
     /// </summary>
-    public string Name => $"catalyst-{ProjectName}";
+    public string Name => $"diagrid-{ProjectName}";
     public ResourceAnnotationCollection Annotations { get; init; } = [];
 
     /// <summary>

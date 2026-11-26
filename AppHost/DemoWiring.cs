@@ -14,7 +14,7 @@ namespace Diagrid.Aspire.Test.AppHost;
 /// </summary>
 public static class DemoWiring
 {
-    public const string DefaultProjectName = "catalyst-aspire-demo";
+    public const string DefaultProjectName = "diagrid-aspire-demo";
 
     public const string SubscriptionRoute = "/orders/received";
 

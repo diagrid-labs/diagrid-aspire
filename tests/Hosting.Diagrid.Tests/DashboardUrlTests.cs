@@ -92,7 +92,7 @@ public class ProjectNameAndWorkingDirectoryTests
         builder.AddDiagridProject("demo");
         builder.AddExecutable("worker", "dotnet", ".").WithDiagridApp();
 
-        var proxy = builder.Resources.OfType<ExecutableResource>().Single(r => r.Name == "worker-catalyst-proxy");
+        var proxy = builder.Resources.OfType<ExecutableResource>().Single(r => r.Name == "worker-diagrid-proxy");
 
         Assert.Equal(builder.AppHostDirectory, proxy.WorkingDirectory);
         Assert.NotEqual(".", proxy.WorkingDirectory);

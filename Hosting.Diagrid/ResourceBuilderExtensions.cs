@@ -166,7 +166,7 @@ public static partial class ResourceBuilderExtensions
             ? resourceWithEndpoints.GetEndpoints().FirstOrDefault((endpoint) => endpoint.IsHttp)
             : null;
 
-        var proxyName = $"{resourceBuilder.Resource.Name}-catalyst-proxy";
+        var proxyName = $"{resourceBuilder.Resource.Name}-diagrid-proxy";
         IResourceBuilder<ExecutableResource> diagridProxy;
 
         try
