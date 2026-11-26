@@ -41,6 +41,7 @@
     <Content Include="..\..\.github\workflows\release.yaml" Link="packaging\release.yaml" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="..\..\.github\workflows\ci.yaml" Link="packaging\ci.yaml" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="..\..\global.json" Link="packaging\global.json" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\Directory.Build.props" Link="packaging\Directory.Build.props" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="Hosting.Catalyst.Tests.csproj" Link="packaging\Hosting.Catalyst.Tests.csproj" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="..\Hosting.Catalyst.IntegrationTests\Hosting.Catalyst.IntegrationTests.csproj" Link="packaging\Hosting.Catalyst.IntegrationTests.csproj" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="..\Hosting.Catalyst.SmokeTests\Hosting.Catalyst.SmokeTests.csproj" Link="packaging\Hosting.Catalyst.SmokeTests.csproj" CopyToOutputDirectory="PreserveNewest" />
