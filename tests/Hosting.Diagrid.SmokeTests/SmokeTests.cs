@@ -58,13 +58,13 @@ public class SmokeTests
     [SkippableFact(Timeout = 25 * 60 * 1000)]
     public async Task Provisions_an_app_and_an_agent_with_state_and_pubsub_then_tears_down()
     {
-        Skip.IfNot(SmokeProject.Enabled, "Set CATALYST_SMOKE_ENABLED=true (and log in) to run against a real Diagrid account.");
+        Skip.IfNot(SmokeProject.Enabled, "Set DIAGRID_SMOKE_ENABLED=true (and log in) to run against a real Diagrid account.");
 
         var name = SmokeProject.NewName();
         try
         {
-            // The USE_CATALYST=true AppHost wiring (test-api app, kvstore, pubsub, subscription), plus an agent.
-            var builder = DistributedApplication.CreateBuilder(["USE_CATALYST=true"]);
+            // The USE_DIAGRID=true AppHost wiring (test-api app, kvstore, pubsub, subscription), plus an agent.
+            var builder = DistributedApplication.CreateBuilder(["USE_DIAGRID=true"]);
             DemoWiring.Configure(builder, DemoWiring.UseDiagrid(builder), RepoFile("TestApi", "TestApi.csproj"), name);
             var catalyst = builder.Resources.OfType<DiagridProject>().Single();
             Assert.Equal(name, catalyst.ProjectName);

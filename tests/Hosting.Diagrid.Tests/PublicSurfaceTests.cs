@@ -16,12 +16,12 @@ public class PublicSurfaceTests
 
         // Deliberately changed the public API? Regenerate the baseline instead of transcribing it out of an
         // xunit sequence diff, which is how a guard like this ends up deleted. From the repo root:
-        //   CATALYST_WRITE_PUBLIC_SURFACE=$PWD/tests/Hosting.Diagrid.Tests/public-surface.txt \
+        //   DIAGRID_WRITE_PUBLIC_SURFACE=$PWD/tests/Hosting.Diagrid.Tests/public-surface.txt \
         //     dotnet test tests/Hosting.Diagrid.Tests --framework net10.0 --filter PublicSurfaceIsIdenticalOnEveryTargetFramework
         // Regenerate from the highest framework the package targets: a lower one would bake its narrower
         // view in if the package ever multi-targets again. This run writes and does not verify; the next
         // ordinary run is what checks the result.
-        var destination = Environment.GetEnvironmentVariable("CATALYST_WRITE_PUBLIC_SURFACE");
+        var destination = Environment.GetEnvironmentVariable("DIAGRID_WRITE_PUBLIC_SURFACE");
         if (!string.IsNullOrWhiteSpace(destination))
         {
             // Join with '\n' rather than WriteAllLines: on Windows that writes CRLF, and .gitattributes

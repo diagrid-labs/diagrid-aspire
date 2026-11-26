@@ -9,7 +9,7 @@ using Microsoft.Extensions.Configuration;
 namespace Diagrid.Aspire.Test.AppHost;
 
 /// <summary>
-///     The one place the USE_CATALYST switch lives. AppHost.cs calls it, and so do the tests, so the shape the
+///     The one place the USE_DIAGRID switch lives. AppHost.cs calls it, and so do the tests, so the shape the
 ///     tests assert is the shape that runs. Both sides address components named "kvstore" and "pubsub".
 /// </summary>
 public static class DemoWiring
@@ -60,5 +60,5 @@ public static class DemoWiring
         return api;
     }
 
-    public static bool UseDiagrid(IDistributedApplicationBuilder builder) => builder.Configuration.GetValue<bool>("USE_CATALYST");
+    public static bool UseDiagrid(IDistributedApplicationBuilder builder) => builder.Configuration.GetValue<bool>("USE_DIAGRID");
 }

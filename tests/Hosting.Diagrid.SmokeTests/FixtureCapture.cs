@@ -7,7 +7,7 @@ namespace Hosting.Diagrid.SmokeTests;
 
 /// <summary>
 /// Re-captures tests/fixtures/*.json from a real CLI. The nightly workflow runs it and opens a PR if the files
-/// change, so the diff is the drift signal. Skipped unless CATALYST_CAPTURE_FIXTURES_DIR names the output folder.
+/// change, so the diff is the drift signal. Skipped unless DIAGRID_CAPTURE_FIXTURES_DIR names the output folder.
 /// Output is normalised so a run on another day or account does not by itself produce a diff: tokens become the
 /// mock values the offline tests assert on (a real token must never reach a public repo), names become "demo",
 /// timestamps and ids become constants. project-get-pending.json and agent-get-no-token.json describe transient
@@ -32,7 +32,7 @@ public partial class FixtureCapture
     public async Task Captures_fixtures_from_the_real_cli()
     {
         var outDir = SmokeProject.CaptureDirectory;
-        Skip.If(outDir is null, "Set CATALYST_CAPTURE_FIXTURES_DIR to capture fixtures.");
+        Skip.If(outDir is null, "Set DIAGRID_CAPTURE_FIXTURES_DIR to capture fixtures.");
         Directory.CreateDirectory(outDir!);
 
         var project = SmokeProject.NewName();

@@ -56,13 +56,13 @@ public class AppHostShapeTests
         Assert.Equal(useDiagrid, !api.Resource.Annotations.OfType<DaprSidecarAnnotation>().Any());
     }
 
-    // Mutation: ignore USE_CATALYST in UseDiagridAsync() -> the true row sees no Diagrid project.
+    // Mutation: ignore USE_DIAGRID in UseDiagridAsync() -> the true row sees no Diagrid project.
     [Theory]
     [InlineData("true", true)]
     [InlineData("false", false)]
-    public void The_USE_CATALYST_setting_selects_the_side(string value, bool expectDiagrid)
+    public void The_USE_DIAGRID_setting_selects_the_side(string value, bool expectDiagrid)
     {
-        var builder = DistributedApplication.CreateBuilder([$"USE_CATALYST={value}"]);
+        var builder = DistributedApplication.CreateBuilder([$"USE_DIAGRID={value}"]);
         DemoWiring.Configure(builder, DemoWiring.UseDiagrid(builder), RepoFile("TestApi", "TestApi.csproj"));
 
         Assert.Equal(expectDiagrid, builder.Resources.Any(r => r is DiagridProject));
@@ -128,11 +128,11 @@ public class AppHostShapeTests
         Assert.Contains(".WithTopic(PubSub, Topic)", source, StringComparison.Ordinal);
 
         // The pitch: service code is identical on both sides, so it never looks at the switch or at the
-        // hosting integration. Mutation: add a USE_CATALYST / Configuration branch, or a
+        // hosting integration. Mutation: add a USE_DIAGRID / Configuration branch, or a
         // Diagrid.Aspire.Hosting reference, to TestApi.
         // Not "Diagrid" on its own: TestApi legitimately uses Diagrid.Aspire.Test.ServiceDefaults, so that
         // assertion would fail for a reason that has nothing to do with the pitch.
-        Assert.DoesNotContain("USE_CATALYST", source, StringComparison.Ordinal);
+        Assert.DoesNotContain("USE_DIAGRID", source, StringComparison.Ordinal);
         Assert.DoesNotContain("Diagrid.Aspire.Hosting", source, StringComparison.Ordinal);
     }
 

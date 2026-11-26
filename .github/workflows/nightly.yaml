@@ -35,13 +35,15 @@ jobs:
     timeout-minutes: 60
     env:
       # A boolean only: the secret itself is not in the job environment.
-      HAS_CATALYST_KEY: ${{ secrets.CATALYST_API_KEY != '' }}
+      # The secret keeps its old name on purpose: renaming a repository secret is a maintainer step,
+      # and DIAGRID_API_KEY is a name the Diagrid CLI reads itself, so it is not the one to move to.
+      HAS_DIAGRID_KEY: ${{ secrets.CATALYST_API_KEY != '' }}
 
     steps:
       - name: "Gate on the API key"
         id: gate
         run: |
-          if [ "$HAS_CATALYST_KEY" != "true" ]; then
+          if [ "$HAS_DIAGRID_KEY" != "true" ]; then
             echo "CATALYST_API_KEY is not set; skipping the nightly run."
             echo "enabled=false" >> "$GITHUB_OUTPUT"
           else
@@ -119,7 +121,7 @@ jobs:
         if: steps.gate.outputs.enabled == 'true'
         continue-on-error: true
         env:
-          CATALYST_SMOKE_ENABLED: "true"
+          DIAGRID_SMOKE_ENABLED: "true"
           HOME: ${{ runner.temp }}/catalyst-home
           XDG_CONFIG_HOME: ${{ runner.temp }}/catalyst-home/.config
         run: |
@@ -132,7 +134,7 @@ jobs:
         if: steps.gate.outputs.enabled == 'true'
         continue-on-error: true
         env:
-          CATALYST_CAPTURE_FIXTURES_DIR: ${{ github.workspace }}/tests/fixtures
+          DIAGRID_CAPTURE_FIXTURES_DIR: ${{ github.workspace }}/tests/fixtures
           HOME: ${{ runner.temp }}/catalyst-home
           XDG_CONFIG_HOME: ${{ runner.temp }}/catalyst-home/.config
         run: |

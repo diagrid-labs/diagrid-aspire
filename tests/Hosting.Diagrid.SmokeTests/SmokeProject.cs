@@ -9,10 +9,10 @@ internal static class SmokeProject
     internal const string Prefix = "aspire-smoke-";
 
     internal static bool Enabled
-        => string.Equals(Environment.GetEnvironmentVariable("CATALYST_SMOKE_ENABLED"), "true", StringComparison.OrdinalIgnoreCase);
+        => string.Equals(Environment.GetEnvironmentVariable("DIAGRID_SMOKE_ENABLED"), "true", StringComparison.OrdinalIgnoreCase);
 
     internal static string? CaptureDirectory
-        => Environment.GetEnvironmentVariable("CATALYST_CAPTURE_FIXTURES_DIR") is { Length: > 0 } dir ? dir : null;
+        => Environment.GetEnvironmentVariable("DIAGRID_CAPTURE_FIXTURES_DIR") is { Length: > 0 } dir ? dir : null;
 
     /// <summary>A unique name per call, so concurrent runs and reruns never collide. 25 characters.</summary>
     internal static string NewName() => Prefix + Guid.NewGuid().ToString("N")[..12];

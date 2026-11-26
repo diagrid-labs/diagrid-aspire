@@ -42,7 +42,7 @@ jobs:
         run: dotnet build
 
       # Nothing shipped without the suite that guards it. The same three suites CI runs, so a red main cannot
-      # become a published package. The account-backed smoke tests skip without CATALYST_SMOKE_ENABLED.
+      # become a published package. The account-backed smoke tests skip without DIAGRID_SMOKE_ENABLED.
       - name: "Unit tests"
         run: dotnet test tests/Hosting.Diagrid.Tests --no-build
 

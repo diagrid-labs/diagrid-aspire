@@ -58,6 +58,6 @@ jobs:
       - name: "Integration tests"
         run: dotnet test tests/Hosting.Diagrid.IntegrationTests --no-build
 
-      # Proves the opt-in tests skip without CATALYST_SMOKE_ENABLED: a skip, not a failure, and no account touched.
+      # Proves the opt-in tests skip without DIAGRID_SMOKE_ENABLED: a skip, not a failure, and no account touched.
       - name: "Smoke tests (account-backed tests must skip; offline normaliser tests run)"
         run: dotnet test tests/Hosting.Diagrid.SmokeTests --no-build
