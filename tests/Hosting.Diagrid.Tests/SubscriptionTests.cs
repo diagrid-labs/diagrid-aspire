@@ -13,10 +13,10 @@ public class SubscriptionTests
     private static DiagridProject Build(Action<IResourceBuilder<ExecutableResource>> configure)
     {
         var builder = DistributedApplication.CreateBuilder();
-        var catalyst = builder.AddDiagridProject("demo");
+        var diagrid = builder.AddDiagridProject("demo");
         var app = builder.AddExecutable("test-api", "dotnet", ".").WithDiagridApp();
         configure(app);
-        return catalyst.Resource;
+        return diagrid.Resource;
     }
 
     // Mutation: put the old constant name back ($"{resource}-pubsub") -> the second WithSubscription throws.

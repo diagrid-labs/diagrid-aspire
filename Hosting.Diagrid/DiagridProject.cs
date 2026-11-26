@@ -6,7 +6,7 @@ using Diagrid.Aspire.Hosting.Model;
 namespace Diagrid.Aspire.Hosting;
 
 /// <summary>
-///     Represents an entire catalyst project and the resources contained within it.
+///     Represents an entire Diagrid project and the resources contained within it.
 /// </summary>
 public class DiagridProject : IResource
 {

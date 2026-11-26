@@ -45,10 +45,10 @@ public class ResourceBuilderTests
     public void Passes_app_port_to_dev_run_for_a_resource_with_an_http_endpoint()
     {
         var builder = DistributedApplication.CreateBuilder();
-        var catalyst = builder.AddDiagridProject("demo");
+        var diagrid = builder.AddDiagridProject("demo");
         builder.AddContainer("api", "img").WithHttpEndpoint(targetPort: 8080).WithDiagridApp();
 
-        var args = DevRunArgsFor(catalyst.Resource, "api");
+        var args = DevRunArgsFor(diagrid.Resource, "api");
 
         var index = args.IndexOf("--app-port");
         Assert.True(index >= 0, "--app-port should be present when the resource has an HTTP endpoint");
@@ -60,7 +60,7 @@ public class ResourceBuilderTests
     public void Dev_run_argv_for_a_resource_with_an_http_endpoint_is_exactly_as_expected()
     {
         var builder = DistributedApplication.CreateBuilder();
-        var catalyst = builder.AddDiagridProject("demo");
+        var diagrid = builder.AddDiagridProject("demo");
         builder.AddContainer("api", "img").WithHttpEndpoint(targetPort: 8080).WithDiagridApp();
 
         Assert.Equal(
@@ -68,7 +68,7 @@ public class ResourceBuilderTests
                 "dev", "run", "--no-color=true", "--approve", "--project", "demo", "--id", "api",
                 "--app-port", "{api.bindings.http.port}", "--skip-managed-kv", "--skip-managed-pubsub",
             ],
-            DevRunArgsFor(catalyst.Resource, "api"));
+            DevRunArgsFor(diagrid.Resource, "api"));
     }
 
     [Fact]
@@ -101,12 +101,12 @@ public class ResourceBuilderTests
     public void Accepts_a_resource_name_whose_proxy_name_is_exactly_at_the_aspire_limit()
     {
         var builder = DistributedApplication.CreateBuilder();
-        var catalyst = builder.AddDiagridProject("demo");
+        var diagrid = builder.AddDiagridProject("demo");
         var name = new string('a', 50);
 
         builder.AddExecutable(name, "dotnet", ".").WithDiagridApp();
 
-        Assert.Single(catalyst.Resource.Identities);
+        Assert.Single(diagrid.Resource.Identities);
         Assert.Equal(64, $"{name}-diagrid-proxy".Length);
     }
 
@@ -129,10 +129,10 @@ public class ResourceBuilderTests
     public async Task Environment_callback_resolves_for_a_resource_with_no_http_endpoint()
     {
         var builder = DistributedApplication.CreateBuilder();
-        var catalyst = builder.AddDiagridProject("demo");
+        var diagrid = builder.AddDiagridProject("demo");
         var worker = builder.AddExecutable("worker", "dotnet", ".").WithDiagridApp();
 
-        var project = catalyst.Resource;
+        var project = diagrid.Resource;
         project.GrpcEndpoint.SetResult("https://grpc.example");
         project.HttpEndpoint.SetResult("https://http.example");
         project.Identities[worker.Resource].Details.SetResult(new AppDetails { ApiToken = "tok" });
@@ -158,9 +158,9 @@ public class ResourceBuilderTests
     private static (DiagridProject Project, IResourceBuilder<ExecutableResource> Worker) BuildWorkerWithNoEndpoint()
     {
         var builder = DistributedApplication.CreateBuilder();
-        var catalyst = builder.AddDiagridProject("demo");
+        var diagrid = builder.AddDiagridProject("demo");
         var worker = builder.AddExecutable("worker", "dotnet", ".").WithDiagridApp();
-        return (catalyst.Resource, worker);
+        return (diagrid.Resource, worker);
     }
 
     private static List<string> DevRunArgsFor(DiagridProject project, string resourceName = "worker")

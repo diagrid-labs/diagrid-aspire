@@ -75,7 +75,7 @@ public class AppHostShapeTests
     public void Both_sides_name_the_same_state_and_pubsub_components()
     {
         var (diagridBuilder, _) = Build(true);
-        var catalyst = diagridBuilder.Resources.OfType<DiagridProject>().Single();
+        var diagrid = diagridBuilder.Resources.OfType<DiagridProject>().Single();
         var (_, ossApi) = Build(false);
         var resources = OssSidecarResourcesDir(ossApi);
 
@@ -84,9 +84,9 @@ public class AppHostShapeTests
 
         Assert.Equal("kvstore", ossState);
         Assert.Equal("pubsub", ossPubSub);
-        Assert.Equal([ossState], catalyst.KvStores.Keys);
-        Assert.Equal([ossPubSub], catalyst.PubSubs.Keys);
-        Assert.Equal(ossPubSub, Assert.Single(catalyst.Subscriptions).Value.Component);
+        Assert.Equal([ossState], diagrid.KvStores.Keys);
+        Assert.Equal([ossPubSub], diagrid.PubSubs.Keys);
+        Assert.Equal(ossPubSub, Assert.Single(diagrid.Subscriptions).Value.Component);
     }
 
     // Each YAML file must declare the right component type for its name (a state store named "kvstore").
@@ -144,9 +144,9 @@ public class AppHostShapeTests
     public void Workflows_rely_on_the_managed_store_alone()
     {
         var (builder, _) = Build(true);
-        var catalyst = builder.Resources.OfType<DiagridProject>().Single();
+        var diagrid = builder.Resources.OfType<DiagridProject>().Single();
 
-        Assert.True(catalyst.ProjectDescriptor.EnableManagedWorkflow);
-        Assert.Empty(catalyst.Components);
+        Assert.True(diagrid.ProjectDescriptor.EnableManagedWorkflow);
+        Assert.Empty(diagrid.Components);
     }
 }

@@ -241,6 +241,48 @@ Every run compares what the AppHost declares against what is in Diagrid. What ha
 
 `EnableWorkflowHistorySigning` is the one to watch. It can only be chosen when the project is created and cannot be changed afterwards, so setting it against an existing project silently does nothing.
 
+## What is still called Catalyst
+
+The rename stopped deliberately at these, and a find-and-replace over them breaks things:
+
+- **`diagrid product use catalyst`.** The word selects the CLI's product, not ours. The platform still
+  has a Catalyst product, so changing this string makes provisioning fail at run time, on a developer's
+  machine, with an unknown-product error. `PreflightTests` pins the exact arguments.
+- **The `catalyst.*.diagrid.io` console hosts.** Diagrid's own domains. They change when Diagrid
+  changes them, not when this package does.
+- **`tests/fixtures/**`.** Captured CLI output and prose. A diff there means a change reached the wire.
+- **The release notes below.** They record what earlier versions renamed. Rewriting them would make them
+  describe renames that never happened.
+- **`PackageTags`.** It still carries `catalyst`, so a search for the old name finds the new package.
+- **The `CATALYST_API_KEY` repository secret**, until a maintainer renames it. Not to `DIAGRID_API_KEY`:
+  the Diagrid CLI reads that name itself.
+
+## Upgrading to the Diagrid rename
+
+The package is now **`Diagrid.Aspire.Hosting`**. `Diagrid.Aspire.Hosting.Catalyst` is deprecated and
+will not get further versions.
+
+Every public name follows the same rule: Diagrid in place of Catalyst. `AddCatalystProject` is
+`AddDiagridProject`, `WithCatalystApp` is `WithDiagridApp`, and so on. The old method names still work
+for this one minor release, marked `[Obsolete]` with a message naming the replacement, and go in the
+next one.
+
+**Two types have no compatibility form.** `CatalystProject` is `DiagridProject` and
+`CliCatalystProvisioner` is `CliDiagridProvisioner`, with no obsolete alias, because
+`IResourceBuilder<T>` is invariant and an obsolete base would not satisfy code expecting the old type.
+If you name either in a variable declaration, edit it. `CatalystCliException` and
+`ICatalystProvisioner` do have one, so an existing `catch` or implementation still compiles.
+
+**Provisioned resources are renamed.** A project resource is now `diagrid-{projectName}` and its proxy
+`{name}-diagrid-proxy`. The suffix is one character shorter, so the longest usable project name goes
+from 49 to 50.
+
+**The demo creates a new project.** `DefaultProjectName` is now `diagrid-aspire-demo`. If you have run
+the demo before, your old `catalyst-aspire-demo` project is still in your Diagrid account and nothing
+will use it again: delete it.
+
+**Environment variables take the `DIAGRID_` prefix**, including `USE_DIAGRID` in the demo.
+
 ## Upgrading from 1.x to 2.0
 
 If you are upgrading an existing AppHost, read this section before you run it.

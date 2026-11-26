@@ -1,5 +1,5 @@
 # Dapr OSS side of the USE_DIAGRID switch. The component name MUST stay "kvstore": it is what
-# WithCatalystKvStore() defaults to, so TestApi addresses the same name whichever side runs.
+# WithDiagridKvStore() defaults to, so TestApi addresses the same name whichever side runs.
 apiVersion: dapr.io/v1alpha1
 kind: Component
 metadata:

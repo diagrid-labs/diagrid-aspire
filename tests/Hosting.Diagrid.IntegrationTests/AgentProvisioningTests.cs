@@ -39,7 +39,7 @@ public class AgentProvisioningTests
     private static Action<DiagridProject> Declared(bool agent = true, bool app = false) => project =>
     {
         var builder = DistributedApplication.CreateBuilder();
-        var catalyst = builder.AddDiagridProject("demo");
+        var diagrid = builder.AddDiagridProject("demo");
         if (agent)
         {
             builder.AddExecutable(AgentName, "dotnet", ".").WithDiagridAgent();
@@ -50,7 +50,7 @@ public class AgentProvisioningTests
             builder.AddExecutable(AppName, "dotnet", ".").WithDiagridApp();
         }
 
-        foreach (var pair in catalyst.Resource.Identities)
+        foreach (var pair in diagrid.Resource.Identities)
         {
             project.Identities.Add(pair.Key, pair.Value);
         }

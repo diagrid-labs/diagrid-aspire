@@ -21,10 +21,10 @@ public class SubscriptionReconcileTests
     private static Action<DiagridProject> Declared(Action<IResourceBuilder<ExecutableResource>> declare) => project =>
     {
         var builder = DistributedApplication.CreateBuilder();
-        var catalyst = builder.AddDiagridProject("demo");
+        var diagrid = builder.AddDiagridProject("demo");
         declare(builder.AddExecutable("test-api", "dotnet", ".").WithDiagridApp());
 
-        foreach (var pair in catalyst.Resource.Subscriptions)
+        foreach (var pair in diagrid.Resource.Subscriptions)
         {
             project.Subscriptions.Add(pair.Key, pair.Value);
         }

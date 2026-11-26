@@ -21,7 +21,7 @@ permissions:
 
 # One run at a time against the account.
 concurrency:
-  group: nightly-catalyst
+  group: nightly-diagrid
   cancel-in-progress: false
 
 defaults:

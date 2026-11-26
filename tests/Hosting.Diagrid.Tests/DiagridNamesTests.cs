@@ -12,7 +12,7 @@ public class DiagridNamesTests
     [InlineData("trailing\n")]
     [InlineData("")]
     [InlineData("café")]
-    public void Rejects_an_aspire_name_catalyst_will_not_accept(string name)
+    public void Rejects_an_aspire_name_diagrid_will_not_accept(string name)
     {
         var ex = Assert.Throws<ArgumentException>(() => DiagridNames.EnsureValidResourceName(name));
         Assert.Contains("lowercase", ex.Message, StringComparison.Ordinal);

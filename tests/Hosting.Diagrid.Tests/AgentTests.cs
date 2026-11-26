@@ -72,9 +72,9 @@ public class AgentTests
     private static DiagridProject Build(Action<IDistributedApplicationBuilder> configure)
     {
         var builder = DistributedApplication.CreateBuilder();
-        var catalyst = builder.AddDiagridProject("demo");
+        var diagrid = builder.AddDiagridProject("demo");
         configure(builder);
-        return catalyst.Resource;
+        return diagrid.Resource;
     }
 
     private static List<string> ProxyArgs(DiagridProject project)

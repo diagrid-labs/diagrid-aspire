@@ -42,11 +42,11 @@ public static class DemoWiring
             // The store is still named explicitly even though StateStoreName is the default: switching from
             // Dapr OSS normally means naming the store after the component your services already address, and
             // the demo should show that line rather than hide it behind a default that happens to agree.
-            var catalyst = builder.AddDiagridProject(projectName, new() { EnableManagedWorkflow = true })
+            var diagrid = builder.AddDiagridProject(projectName, new() { EnableManagedWorkflow = true })
                 .WithDiagridKvStore(StateStoreName)
                 .WithDiagridPubSub();
 
-            api.WithDiagridApp(catalyst).WithSubscription("orders", SubscriptionRoute);
+            api.WithDiagridApp(diagrid).WithSubscription("orders", SubscriptionRoute);
         }
         else
         {

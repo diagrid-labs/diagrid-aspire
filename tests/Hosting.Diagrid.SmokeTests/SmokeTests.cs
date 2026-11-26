@@ -66,22 +66,22 @@ public class SmokeTests
             // The USE_DIAGRID=true AppHost wiring (test-api app, kvstore, pubsub, subscription), plus an agent.
             var builder = DistributedApplication.CreateBuilder(["USE_DIAGRID=true"]);
             DemoWiring.Configure(builder, DemoWiring.UseDiagrid(builder), RepoFile("TestApi", "TestApi.csproj"), name);
-            var catalyst = builder.Resources.OfType<DiagridProject>().Single();
-            Assert.Equal(name, catalyst.ProjectName);
+            var diagrid = builder.Resources.OfType<DiagridProject>().Single();
+            Assert.Equal(name, diagrid.ProjectName);
             builder.AddExecutable("my-agent", "dotnet", ".").WithDiagridAgent();
 
             var loggers = new ResourceLoggerService();
             var notifications = new ResourceNotificationService(
                 NullLogger<ResourceNotificationService>.Instance, new HostLifetimeStub(), new EmptyServiceProvider(), loggers);
             var provisioner = new CliDiagridProvisioner();
-            await new DiagridLifecycleHandler(catalyst, loggers, notifications, provisioner)
+            await new DiagridLifecycleHandler(diagrid, loggers, notifications, provisioner)
                 .ProvisionDiagridAsync(CancellationToken.None);
 
             // The DAPR_* variables are built from exactly these values.
-            Assert.False(string.IsNullOrWhiteSpace(await catalyst.HttpEndpoint.Task), "DAPR_HTTP_ENDPOINT would be empty");
-            Assert.False(string.IsNullOrWhiteSpace(await catalyst.GrpcEndpoint.Task), "DAPR_GRPC_ENDPOINT would be empty");
-            Assert.Equal(2, catalyst.Identities.Count);
-            foreach (var (resource, identity) in catalyst.Identities)
+            Assert.False(string.IsNullOrWhiteSpace(await diagrid.HttpEndpoint.Task), "DAPR_HTTP_ENDPOINT would be empty");
+            Assert.False(string.IsNullOrWhiteSpace(await diagrid.GrpcEndpoint.Task), "DAPR_GRPC_ENDPOINT would be empty");
+            Assert.Equal(2, diagrid.Identities.Count);
+            foreach (var (resource, identity) in diagrid.Identities)
             {
                 var details = await identity.Details.Task;
                 Assert.False(string.IsNullOrWhiteSpace(details.ApiToken), $"DAPR_API_TOKEN would be empty for {resource.Name}");
