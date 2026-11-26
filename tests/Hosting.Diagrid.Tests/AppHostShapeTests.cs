@@ -74,8 +74,8 @@ public class AppHostShapeTests
     [Fact]
     public void Both_sides_name_the_same_state_and_pubsub_components()
     {
-        var (catalystBuilder, _) = Build(true);
-        var catalyst = catalystBuilder.Resources.OfType<DiagridProject>().Single();
+        var (diagridBuilder, _) = Build(true);
+        var catalyst = diagridBuilder.Resources.OfType<DiagridProject>().Single();
         var (_, ossApi) = Build(false);
         var resources = OssSidecarResourcesDir(ossApi);
 
@@ -106,8 +106,8 @@ public class AppHostShapeTests
     public void TestApi_uses_the_component_names_and_serves_the_subscription_route()
     {
         var source = File.ReadAllText(RepoFile("TestApi", "Program.cs"));
-        var (catalystBuilder, _) = Build(true);
-        var subscription = Assert.Single(catalystBuilder.Resources.OfType<DiagridProject>().Single().Subscriptions).Value;
+        var (diagridBuilder, _) = Build(true);
+        var subscription = Assert.Single(diagridBuilder.Resources.OfType<DiagridProject>().Single().Subscriptions).Value;
 
         Assert.Contains("const string StateStore = \"kvstore\";", source, StringComparison.Ordinal);
         Assert.Contains("const string PubSub = \"pubsub\";", source, StringComparison.Ordinal);

@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 namespace Diagrid.Aspire.Hosting;
 
 internal sealed class DiagridLifecycleHandler(
-    DiagridProject catalystProject,
+    DiagridProject diagridProject,
     ResourceLoggerService resourceLogger,
     ResourceNotificationService notifications,
     IDiagridProvisioner provisioner
@@ -28,13 +28,13 @@ internal sealed class DiagridLifecycleHandler(
     internal const string WaitingForProjectState = "Waiting for project";
     internal static readonly TimeSpan ProjectReadyTimeout = TimeSpan.FromMinutes(5);
 
-    private readonly ILogger _logger = resourceLogger.GetLogger(catalystProject);
+    private readonly ILogger _logger = resourceLogger.GetLogger(diagridProject);
 
     public async Task ProvisionDiagridAsync(CancellationToken cancellationToken)
     {
         LogWelcomeMessage();
 
-        await notifications.PublishUpdateAsync(catalystProject, (previous) => previous with
+        await notifications.PublishUpdateAsync(diagridProject, (previous) => previous with
         {
             State = new(KnownResourceStates.Starting, KnownResourceStateStyles.Info),
         });
@@ -56,10 +56,10 @@ internal sealed class DiagridLifecycleHandler(
     /// </summary>
     private void FaultPending(Exception ex)
     {
-        catalystProject.HttpEndpoint.TrySetException(ex);
-        catalystProject.GrpcEndpoint.TrySetException(ex);
+        diagridProject.HttpEndpoint.TrySetException(ex);
+        diagridProject.GrpcEndpoint.TrySetException(ex);
 
-        foreach (var identity in catalystProject.Identities.Values)
+        foreach (var identity in diagridProject.Identities.Values)
         {
             identity.Details.TrySetException(ex);
         }
@@ -81,7 +81,7 @@ internal sealed class DiagridLifecycleHandler(
 
     private async Task InitializeProvisionerAsync(CancellationToken cancellationToken)
     {
-        await notifications.PublishUpdateAsync(catalystProject, (previous) => previous with
+        await notifications.PublishUpdateAsync(diagridProject, (previous) => previous with
         {
             State = new(CheckingCliState, KnownResourceStateStyles.Info),
         });
@@ -100,7 +100,7 @@ internal sealed class DiagridLifecycleHandler(
             _logger.LogError(ex, "{Message}", ex.Message);
             FaultPending(ex);
 
-            await notifications.PublishUpdateAsync(catalystProject, (previous) => previous with
+            await notifications.PublishUpdateAsync(diagridProject, (previous) => previous with
             {
                 State = new(KnownResourceStates.FailedToStart, KnownResourceStateStyles.Error),
             });
@@ -111,14 +111,14 @@ internal sealed class DiagridLifecycleHandler(
 
     private async Task EnsureProjectAsync(CancellationToken cancellationToken)
     {
-        await notifications.PublishUpdateAsync(catalystProject, (previous) => previous with
+        await notifications.PublishUpdateAsync(diagridProject, (previous) => previous with
         {
             State = new("Ensuring project", KnownResourceStateStyles.Info),
         });
 
         try
         {
-            await provisioner.CreateProjectAsync(catalystProject.ProjectName, catalystProject.ProjectDescriptor, cancellationToken);
+            await provisioner.CreateProjectAsync(diagridProject.ProjectName, diagridProject.ProjectDescriptor, cancellationToken);
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
@@ -130,7 +130,7 @@ internal sealed class DiagridLifecycleHandler(
             _logger.LogError(ex, "{Message}", ex.Message);
             FaultPending(ex);
 
-            await notifications.PublishUpdateAsync(catalystProject, (previous) => previous with
+            await notifications.PublishUpdateAsync(diagridProject, (previous) => previous with
             {
                 State = new(KnownResourceStates.FailedToStart, KnownResourceStateStyles.Error),
             });
@@ -141,14 +141,14 @@ internal sealed class DiagridLifecycleHandler(
 
     private async Task SelectProjectAsync(CancellationToken cancellationToken)
     {
-        await notifications.PublishUpdateAsync(catalystProject, (previous) => previous with
+        await notifications.PublishUpdateAsync(diagridProject, (previous) => previous with
         {
             State = new("Selecting project", KnownResourceStateStyles.Info),
         });
 
         try
         {
-            await provisioner.UseProjectAsync(catalystProject.ProjectName, cancellationToken);
+            await provisioner.UseProjectAsync(diagridProject.ProjectName, cancellationToken);
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
@@ -160,7 +160,7 @@ internal sealed class DiagridLifecycleHandler(
             _logger.LogError(ex, "{Message}", ex.Message);
             FaultPending(ex);
 
-            await notifications.PublishUpdateAsync(catalystProject, (previous) => previous with
+            await notifications.PublishUpdateAsync(diagridProject, (previous) => previous with
             {
                 State = new(KnownResourceStates.FailedToStart, KnownResourceStateStyles.Error),
             });
@@ -171,7 +171,7 @@ internal sealed class DiagridLifecycleHandler(
 
     private async Task LoadProjectDetailsAsync(CancellationToken cancellationToken)
     {
-        await notifications.PublishUpdateAsync(catalystProject, (previous) => previous with
+        await notifications.PublishUpdateAsync(diagridProject, (previous) => previous with
         {
             State = new("Loading project details", KnownResourceStateStyles.Info),
         });
@@ -179,16 +179,16 @@ internal sealed class DiagridLifecycleHandler(
         try
         {
             // A project that already existed may still be starting (project create returns early for it).
-            await notifications.PublishUpdateAsync(catalystProject, (previous) => previous with
+            await notifications.PublishUpdateAsync(diagridProject, (previous) => previous with
             {
                 State = new(WaitingForProjectState, KnownResourceStateStyles.Info),
             });
 
             var projectDetails = await provisioner.WaitForProjectReadyAsync(
-                catalystProject.ProjectName, ProjectReadyTimeout, cancellationToken);
+                diagridProject.ProjectName, ProjectReadyTimeout, cancellationToken);
 
-            catalystProject.HttpEndpoint.SetResult(projectDetails.HttpEndpoint.ToString());
-            catalystProject.GrpcEndpoint.SetResult(projectDetails.GrpcEndpoint.ToString());
+            diagridProject.HttpEndpoint.SetResult(projectDetails.HttpEndpoint.ToString());
+            diagridProject.GrpcEndpoint.SetResult(projectDetails.GrpcEndpoint.ToString());
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
@@ -200,7 +200,7 @@ internal sealed class DiagridLifecycleHandler(
             _logger.LogError(ex, "{Message}", ex.Message);
             FaultPending(ex);
 
-            await notifications.PublishUpdateAsync(catalystProject, (previous) => previous with
+            await notifications.PublishUpdateAsync(diagridProject, (previous) => previous with
             {
                 State = new(KnownResourceStates.FailedToStart, KnownResourceStateStyles.Error),
             });
@@ -211,17 +211,17 @@ internal sealed class DiagridLifecycleHandler(
 
     private async Task EnsureApplicationsAsync(CancellationToken cancellationToken)
     {
-        await notifications.PublishUpdateAsync(catalystProject, (previous) => previous with
+        await notifications.PublishUpdateAsync(diagridProject, (previous) => previous with
         {
             State = new("Ensuring identities", KnownResourceStateStyles.Info),
         });
 
-        foreach (var pair in catalystProject.Identities)
+        foreach (var pair in diagridProject.Identities)
         {
             try
             {
                 var name = pair.Key.Name;
-                var project = catalystProject.ProjectName;
+                var project = diagridProject.ProjectName;
 
                 switch (pair.Value.Kind)
                 {
@@ -245,7 +245,7 @@ internal sealed class DiagridLifecycleHandler(
                 _logger.LogError(ex, "{Message}", ex.Message);
                 FaultPending(ex);
 
-                await notifications.PublishUpdateAsync(catalystProject, (previous) => previous with
+                await notifications.PublishUpdateAsync(diagridProject, (previous) => previous with
                 {
                     State = new(KnownResourceStates.FailedToStart, KnownResourceStateStyles.Error),
                 });
@@ -257,12 +257,12 @@ internal sealed class DiagridLifecycleHandler(
 
     private async Task EnsureServicesAsync(CancellationToken cancellationToken)
     {
-        await notifications.PublishUpdateAsync(catalystProject, (previous) => previous with
+        await notifications.PublishUpdateAsync(diagridProject, (previous) => previous with
         {
             State = new("Ensuring services", KnownResourceStateStyles.Info),
         });
 
-        foreach (var pair in catalystProject.PubSubs)
+        foreach (var pair in diagridProject.PubSubs)
         {
             try
             {
@@ -280,7 +280,7 @@ internal sealed class DiagridLifecycleHandler(
                 _logger.LogError(ex, "{Message}", ex.Message);
                 FaultPending(ex);
 
-                await notifications.PublishUpdateAsync(catalystProject, (previous) => previous with
+                await notifications.PublishUpdateAsync(diagridProject, (previous) => previous with
                 {
                     State = new(KnownResourceStates.FailedToStart, KnownResourceStateStyles.Error),
                 });
@@ -289,7 +289,7 @@ internal sealed class DiagridLifecycleHandler(
             }
         }
 
-        foreach (var pair in catalystProject.KvStores)
+        foreach (var pair in diagridProject.KvStores)
         {
             try
             {
@@ -307,7 +307,7 @@ internal sealed class DiagridLifecycleHandler(
                 _logger.LogError(ex, "{Message}", ex.Message);
                 FaultPending(ex);
 
-                await notifications.PublishUpdateAsync(catalystProject, (previous) => previous with
+                await notifications.PublishUpdateAsync(diagridProject, (previous) => previous with
                 {
                     State = new(KnownResourceStates.FailedToStart, KnownResourceStateStyles.Error),
                 });
@@ -348,7 +348,7 @@ internal sealed class DiagridLifecycleHandler(
         CancellationToken cancellationToken
     )
     {
-        if (catalystProject.Components.ContainsKey(name))
+        if (diagridProject.Components.ContainsKey(name))
         {
             return;
         }
@@ -361,25 +361,25 @@ internal sealed class DiagridLifecycleHandler(
             Metadata = new Dictionary<string, object?> { [infraMetadataKey] = name },
         };
 
-        await provisioner.UpsertComponentAsync(descriptor, catalystProject.ProjectName, isManagedServiceComponent: false, cancellationToken);
+        await provisioner.UpsertComponentAsync(descriptor, diagridProject.ProjectName, isManagedServiceComponent: false, cancellationToken);
     }
 
     private async Task EnsureComponentsAsync(CancellationToken cancellationToken)
     {
-        await notifications.PublishUpdateAsync(catalystProject, (previous) => previous with
+        await notifications.PublishUpdateAsync(diagridProject, (previous) => previous with
         {
             State = new("Ensuring components", KnownResourceStateStyles.Info),
         });
 
-        foreach (var pair in catalystProject.Components)
+        foreach (var pair in diagridProject.Components)
         {
             try
             {
                 // A component named after a declared KV store or pub/sub is the one the CLI created for it: update, do not create.
-                var backsDeclaredService = catalystProject.KvStores.ContainsKey(pair.Value.Name)
-                                           || catalystProject.PubSubs.ContainsKey(pair.Value.Name);
+                var backsDeclaredService = diagridProject.KvStores.ContainsKey(pair.Value.Name)
+                                           || diagridProject.PubSubs.ContainsKey(pair.Value.Name);
 
-                await provisioner.UpsertComponentAsync(pair.Value, catalystProject.ProjectName, backsDeclaredService, cancellationToken);
+                await provisioner.UpsertComponentAsync(pair.Value, diagridProject.ProjectName, backsDeclaredService, cancellationToken);
             }
             catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
             {
@@ -391,7 +391,7 @@ internal sealed class DiagridLifecycleHandler(
                 _logger.LogError(ex, "{Message}", ex.Message);
                 FaultPending(ex);
 
-                await notifications.PublishUpdateAsync(catalystProject, (previous) => previous with
+                await notifications.PublishUpdateAsync(diagridProject, (previous) => previous with
                 {
                     State = new(KnownResourceStates.FailedToStart, KnownResourceStateStyles.Error),
                 });
@@ -403,16 +403,16 @@ internal sealed class DiagridLifecycleHandler(
 
     private async Task EnsureSubscriptionsAsync(CancellationToken cancellationToken)
     {
-        await notifications.PublishUpdateAsync(catalystProject, (previous) => previous with
+        await notifications.PublishUpdateAsync(diagridProject, (previous) => previous with
         {
             State = new("Ensuring subscriptions", KnownResourceStateStyles.Info),
         });
 
-        foreach (var pair in catalystProject.Subscriptions)
+        foreach (var pair in diagridProject.Subscriptions)
         {
             try
             {
-                await provisioner.UpsertSubscriptionAsync(catalystProject.ProjectName, pair.Value, cancellationToken);
+                await provisioner.UpsertSubscriptionAsync(diagridProject.ProjectName, pair.Value, cancellationToken);
             }
             catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
             {
@@ -424,7 +424,7 @@ internal sealed class DiagridLifecycleHandler(
                 _logger.LogError(ex, "{Message}", ex.Message);
                 FaultPending(ex);
 
-                await notifications.PublishUpdateAsync(catalystProject, (previous) => previous with
+                await notifications.PublishUpdateAsync(diagridProject, (previous) => previous with
                 {
                     State = new(KnownResourceStates.FailedToStart, KnownResourceStateStyles.Error),
                 });
@@ -436,14 +436,14 @@ internal sealed class DiagridLifecycleHandler(
 
     private async Task CompleteProvisioningAsync()
     {
-        await notifications.PublishUpdateAsync(catalystProject, (previous) => previous with
+        await notifications.PublishUpdateAsync(diagridProject, (previous) => previous with
         {
             State = new(KnownResourceStates.Finished, KnownResourceStateStyles.Success),
         });
 
         _logger.LogInformation("Diagrid has been successfully initialized!");
 
-        await notifications.PublishUpdateAsync(catalystProject, (previous) => previous with
+        await notifications.PublishUpdateAsync(diagridProject, (previous) => previous with
         {
             State = new(KnownResourceStates.Active, KnownResourceStateStyles.Success),
         });
