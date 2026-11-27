@@ -160,7 +160,7 @@ public static partial class ResourceBuilderExtensions
 
         diagridProjectBuilder ??= applicationBuilder.CreateResourceBuilder(diagridProjects.Single());
 
-        resourceBuilder.WaitForCompletion(diagridProjectBuilder);
+        resourceBuilder.WaitFor(diagridProjectBuilder);
 
         EndpointReference? httpEndpoint = resourceBuilder.Resource is IResourceWithEndpoints resourceWithEndpoints
             ? resourceWithEndpoints.GetEndpoints().FirstOrDefault((endpoint) => endpoint.IsHttp)
@@ -189,7 +189,7 @@ public static partial class ResourceBuilderExtensions
                 ex);
         }
 
-        diagridProxy.WaitForCompletion(diagridProjectBuilder);
+        diagridProxy.WaitFor(diagridProjectBuilder);
 
         resourceBuilder
             .WaitFor(diagridProxy)

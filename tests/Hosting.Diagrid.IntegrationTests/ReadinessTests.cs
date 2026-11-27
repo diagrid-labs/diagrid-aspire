@@ -156,6 +156,41 @@ public class ReadinessTests
         Assert.NotEqual(KnownResourceStates.Active, seen[^1]);
     }
 
+    [Fact(Timeout = 60_000)]
+    public async Task Successful_provisioning_leaves_the_project_resource_running()
+    {
+        using var fake = new FakeDiagridFixture();
+        fake.SetScenario(new Scenario
+        {
+            Responses = [.. HandlerHarness.PreflightPasses(), ProjectGetReady(), new() { ExitCode = 0 }],
+        });
+        var (_, handler, states) = Build();
+
+        await handler.ProvisionDiagridAsync(default);
+
+        await states.Drain();
+        var seen = states.Snapshot();
+        Assert.Equal(KnownResourceStates.Running, seen[^1]);
+        Assert.DoesNotContain(KnownResourceStates.Finished, seen);
+        Assert.DoesNotContain(KnownResourceStates.Active, seen);
+    }
+
+    [Fact(Timeout = 60_000)]
+    public async Task A_project_that_starts_pending_also_ends_running()
+    {
+        using var fake = new FakeDiagridFixture();
+        fake.SetScenario(new Scenario
+        {
+            Responses = [.. HandlerHarness.PreflightPasses(), ProjectGetPending(times: 2), ProjectGetReady(), new() { ExitCode = 0 }],
+        });
+        var (_, handler, states) = Build();
+
+        await handler.ProvisionDiagridAsync(default);
+
+        await states.Drain();
+        Assert.Equal(KnownResourceStates.Running, states.Snapshot()[^1]);
+    }
+
     private static (DiagridProject Project, DiagridLifecycleHandler Handler, HandlerHarness.StateRecorder States) Build()
         => HandlerHarness.Build();
 }

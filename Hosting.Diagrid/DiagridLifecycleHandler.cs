@@ -436,16 +436,11 @@ internal sealed class DiagridLifecycleHandler(
 
     private async Task CompleteProvisioningAsync()
     {
-        await notifications.PublishUpdateAsync(diagridProject, (previous) => previous with
-        {
-            State = new(KnownResourceStates.Finished, KnownResourceStateStyles.Success),
-        });
-
         _logger.LogInformation("Diagrid has been successfully initialized!");
 
         await notifications.PublishUpdateAsync(diagridProject, (previous) => previous with
         {
-            State = new(KnownResourceStates.Active, KnownResourceStateStyles.Success),
+            State = new(KnownResourceStates.Running, KnownResourceStateStyles.Success),
         });
     }
 }
