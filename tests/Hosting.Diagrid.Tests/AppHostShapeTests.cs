@@ -149,4 +149,54 @@ public class AppHostShapeTests
         Assert.True(diagrid.ProjectDescriptor.EnableManagedWorkflow);
         Assert.Empty(diagrid.Components);
     }
+
+    private static List<WaitAnnotation> WaitsOnProject(IResource resource, DiagridProject project)
+        => [.. resource.Annotations.OfType<WaitAnnotation>().Where(w => ReferenceEquals(w.Resource, project))];
+
+    private static void AssertWaitsUntilHealthy(IResource resource, DiagridProject project)
+    {
+        var wait = Assert.Single(WaitsOnProject(resource, project));
+        Assert.Equal(WaitType.WaitUntilHealthy, wait.WaitType);
+    }
+
+    // Mutation: put WaitForCompletion back on either site -> the type is WaitForCompletion and this fails.
+    [Fact]
+    public void App_and_proxy_wait_for_the_diagrid_project_to_be_running()
+    {
+        var (builder, api) = Build(true);
+        var diagrid = builder.Resources.OfType<DiagridProject>().Single();
+        var proxy = Assert.Single(builder.Resources, r => r.Name == "test-api-diagrid-proxy");
+
+        AssertWaitsUntilHealthy(api.Resource, diagrid);
+        AssertWaitsUntilHealthy(proxy, diagrid);
+        Assert.Empty(diagrid.Annotations.OfType<HealthCheckAnnotation>());
+    }
+
+    [Fact]
+    public void Every_app_on_one_project_waits_for_it()
+    {
+        var builder = DistributedApplication.CreateBuilder();
+        var diagrid = builder.AddDiagridProject("shared-project");
+        var first = builder.AddDotnetProject("first-api", RepoFile("TestApi", "TestApi.csproj")).WithDiagridApp(diagrid);
+        var second = builder.AddDotnetProject("second-api", RepoFile("TestApi", "TestApi.csproj")).WithDiagridApp(diagrid);
+
+        AssertWaitsUntilHealthy(first.Resource, diagrid.Resource);
+        AssertWaitsUntilHealthy(second.Resource, diagrid.Resource);
+        AssertWaitsUntilHealthy(Assert.Single(builder.Resources, r => r.Name == "first-api-diagrid-proxy"), diagrid.Resource);
+        AssertWaitsUntilHealthy(Assert.Single(builder.Resources, r => r.Name == "second-api-diagrid-proxy"), diagrid.Resource);
+    }
+
+    [Fact]
+    public void The_obsolete_catalyst_alias_wires_the_same_wait()
+    {
+        var builder = DistributedApplication.CreateBuilder();
+        var diagrid = builder.AddDiagridProject("alias-project");
+        var api = builder.AddDotnetProject("alias-api", RepoFile("TestApi", "TestApi.csproj"));
+#pragma warning disable CS0618
+        api.WithCatalystApp(diagrid);
+#pragma warning restore CS0618
+
+        AssertWaitsUntilHealthy(api.Resource, diagrid.Resource);
+        AssertWaitsUntilHealthy(Assert.Single(builder.Resources, r => r.Name == "alias-api-diagrid-proxy"), diagrid.Resource);
+    }
 }
