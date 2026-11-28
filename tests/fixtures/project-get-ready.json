@@ -1,5 +1,5 @@
 {
-  "_capturedFrom": "diagrid CLI 1.112.0, captured by the nightly workflow",
+  "_capturedFrom": "diagrid CLI 1.142.0, captured by the nightly workflow",
   "apiVersion": "cra.diagrid.io/v1beta1",
   "kind": "Project",
   "metadata": {
@@ -16,7 +16,7 @@
     "defaultAgentInfrastructureEnabled": false,
     "defaultKVStoreEnabled": false,
     "defaultPubsubEnabled": false,
-    "defaultWorkflowStoreEnabled": false,
+    "defaultWorkflowStoreEnabled": true,
     "disableAppTunnels": false,
     "displayName": "demo",
     "enableWorkflowHistorySigning": false,
@@ -24,7 +24,7 @@
     "region": "diagrid-aws-eu-west"
   },
   "status": {
-    "defaultWorkflowStoreEnabled": false,
+    "defaultWorkflowStoreEnabled": true,
     "endpoints": {
       "grpc": {
         "host": "grpc-prj00000000.cloud.r1.diagrid.io",
@@ -38,6 +38,19 @@
         "scheme": "https",
         "url": "https://http-prj00000000.cloud.r1.diagrid.io:443"
       }
+    },
+    "namespace": {
+      "labels": {
+        "cra.diagrid.io/org-id": "00000000-0000-0000-0000-000000000001",
+        "cra.diagrid.io/project-id": "00000000",
+        "cra.diagrid.io/project-name": "demo",
+        "cra.diagrid.io/project-namespace": "true",
+        "pod-security.kubernetes.io/audit": "restricted",
+        "pod-security.kubernetes.io/enforce": "baseline",
+        "pod-security.kubernetes.io/warn": "restricted"
+      },
+      "name": "prj-00000000",
+      "settable": false
     },
     "regionEndpoints": [
       {
