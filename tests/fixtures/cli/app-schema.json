@@ -207,8 +207,12 @@
             "temporal"
           ],
           "default": "dapr",
-          "description": "The API this App's workflows use: \"dapr\" (the default) or \"temporal\". With \"temporal\", Temporal SDK clients connect to the project's gRPC endpoint, status.endpoints.grpc, using the App's name as the namespace and its API token as the API key. It needs a region that supports it and a project with a workflow store, and it cannot be changed later.",
+          "description": "The API this App's workflows use: \"dapr\" (the default) or \"temporal\". With \"temporal\", Temporal SDK clients connect to the project's gRPC endpoint, status.endpoints.grpc, using the App's name as the namespace and its API token as the API key. It needs a region that supports it, a project with a workflow store and an App that is not external, and it cannot be changed later.",
           "x-immutable": true
+        },
+        "external": {
+          "type": "boolean",
+          "description": "Marks an App whose workload connects to the data plane from outside Catalyst. Its backing App ID's status.externalBootstrapConfig (request the App with include=appids) holds what that workload needs to connect. It cannot be changed after creation."
         }
       },
       "required": [
@@ -609,6 +613,80 @@
                     "default": "dapr",
                     "description": "The API this App ID's workflows use: \"dapr\" (the default) or \"temporal\". With \"temporal\", Temporal SDK clients connect to the project's gRPC endpoint, status.endpoints.grpc, using the App ID's name as the namespace and its API token as the API key. It needs a region that supports it, a project with a workflow store and an App ID that is not external, and it cannot be changed later.",
                     "x-immutable": true
+                  },
+                  "compute": {
+                    "type": "object",
+                    "title": "AppStatusAppIdsItemSpecCompute",
+                    "description": "The serverless compute that runs the App ID's workflow workers. Catalyst starts a worker on it when the App ID has work and no worker is connected, and stops it when the App ID has had no work for a while.",
+                    "properties": {
+                      "provider": {
+                        "type": "string",
+                        "description": "The compute provider: awsAgentCore."
+                      },
+                      "awsAgentCore": {
+                        "type": "object",
+                        "title": "AppStatusAppIdsItemSpecComputeAwsAgentCore",
+                        "description": "The Amazon Bedrock AgentCore Runtime that runs the App ID's workers. Each worker runs in its own Runtime session.",
+                        "properties": {
+                          "runtimeArn": {
+                            "type": "string",
+                            "description": "The ARN of the AgentCore Runtime that runs the worker."
+                          },
+                          "endpointName": {
+                            "type": "string",
+                            "description": "The Runtime endpoint to invoke, which selects the code version new workers run. Defaults to DEFAULT, which follows the newest version. Changing it replaces the running workers."
+                          },
+                          "roleArn": {
+                            "type": "string",
+                            "description": "The IAM role Catalyst assumes, through web identity federation with the App ID's regional identity, to start and stop sessions."
+                          }
+                        },
+                        "required": [
+                          "runtimeArn",
+                          "roleArn"
+                        ]
+                      },
+                      "scaling": {
+                        "type": "object",
+                        "title": "AppStatusAppIdsItemSpecComputeScaling",
+                        "description": "Sets how workers are started and stopped. Every value must be above zero.",
+                        "properties": {
+                          "cooldownSeconds": {
+                            "type": "integer",
+                            "format": "int32",
+                            "description": "How long the App ID must have no pending and no in-flight work before its workers are stopped."
+                          },
+                          "startTimeoutSeconds": {
+                            "type": "integer",
+                            "format": "int32",
+                            "description": "How long a worker has to connect after it is started. A worker that has not connected by then is a failed start."
+                          },
+                          "startBackoffSeconds": {
+                            "type": "integer",
+                            "format": "int32",
+                            "description": "How long to wait after a failed start before starting again."
+                          },
+                          "maxFailedStarts": {
+                            "type": "integer",
+                            "format": "int32",
+                            "description": "The number of consecutive failed starts after which no more workers are started until spec.compute changes, or the App ID's work drops to zero and returns."
+                          },
+                          "minConnectionSeconds": {
+                            "type": "integer",
+                            "format": "int32",
+                            "description": "How long a worker must stay connected for the failed-start count to reset. A worker that disconnects sooner counts as a failed start."
+                          },
+                          "reconnectGraceSeconds": {
+                            "type": "integer",
+                            "format": "int32",
+                            "description": "How long to wait, after a configuration update, for workers to reconnect before starting one."
+                          }
+                        }
+                      }
+                    },
+                    "required": [
+                      "provider"
+                    ]
                   }
                 },
                 "required": [
